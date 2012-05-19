@@ -587,10 +587,9 @@ function cas_login_page($cas_first_login = FALSE) {
  * to the CAS server to complete the CAS logout process.
  *
  * Other modules intending to call this from their implementation of
- * hook_user_logout() will need to pass $invoke_hook = FALSE to avoid an
+ * hook_user('logout') will need to pass $invoke_hook = FALSE to avoid an
  * infinite recursion. WARNING: since this function does not return, any
- * later implementations of hook_user_logout() will not run. You may wish to
- * adjust the hook execution order using hook_module_implements_alter().
+ * later implementations of hook_user('logout') will not run.
  *
  * @param $invoke_hook
  *   If TRUE, invoke hook_user_logout() and save a watchdog mesage indicating
