@@ -550,7 +550,7 @@ function cas_user_load_by_name($cas_name, $alter = FALSE) {
     $cas_name = $cas_user['name'];
   }
 
-  $result = db_query("SELECT uid FROM {cas_user} WHERE cas_name = '%s'", $cas_name);
+  $result = db_query("SELECT uid FROM {cas_user} WHERE LOWER(cas_name) = LOWER('%s')", $cas_name);
   if ($uid = db_fetch_array($result)) {
     return user_load($uid);
   }

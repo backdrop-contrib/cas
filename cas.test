@@ -431,6 +431,13 @@ class CasUserTestCase extends CasTestHelper {
     // @todo: Need to test that the mail is field is hidden.
     // $this->assertNoField('mail', 'E-mail field is not present.');
   }
+
+  function testCaseInsensitiveLogin() {
+    $account = $this->casCreateUser();
+    $this->casLogin(strtoupper($account->cas_name));
+    $this->assertLoggedIn($account);
+  }
+
 }
 
 
