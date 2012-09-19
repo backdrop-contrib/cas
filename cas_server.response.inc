@@ -37,7 +37,7 @@ function theme_cas_service_validate_success($name, $attributes = array(), $style
  */
 function theme_cas_service_validate_attributes($attributes = array(), $style = 'jasig') {
   $output = '';
-  switch($style) {
+  switch ($style) {
     case 'jasig':
     default:
       $output .= "<cas:attributes>\n";
