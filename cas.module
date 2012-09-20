@@ -1038,17 +1038,13 @@ function _cas_single_sign_out_check() {
         $cas_session_index = (string)$cas_session_indexes[0];
         // Log them out now.
         // first lets find out who we want to log off
-        $result = db_query_range("SELECT cld.uid FROM {cas_login_data} cld WHERE cld.cas_session_id = '%s'", $cas_session_index, 0, 1);
-        if ($result !== FALSE) {
-          while ($cas_login_data = db_fetch_object($result)) {
-            $uid = $cas_login_data->uid;
-            $acct = user_load($uid);
-            watchdog('user', 'Session closed for %name', array('%name' => $acct->name));
-            // remove all entry for user id in cas_login_data
-            db_query("DELETE FROM {cas_login_data} WHERE uid = %d", $uid);
-            // remove their session
-            db_query("DELETE FROM {sessions} WHERE uid = %d", $uid);
-            }
+        $record = db_fetch_object(db_query_range("SELECT cld.uid, u.name FROM {users} u JOIN {cas_login_data} cld ON u.uid = cld.uid WHERE cld.cas_session_id = '%s'", $cas_session_index, 0, 1));
+        if ($record) {
+          watchdog('user', 'Session closed for %name by CAS logout request.', array('%name' => $record->name));
+          // remove all entry for user id in cas_login_data
+          db_query("DELETE FROM {cas_login_data} WHERE uid = %d", $record->uid);
+          // remove their session
+          db_query("DELETE FROM {sessions} WHERE uid = %d", $record->uid);
         }
       }
     }
