@@ -86,3 +86,18 @@ function theme_cas_service_validate_failure($ticket, $error_code) {
 
   return $output;
 }
+
+
+/**
+ * Generate the Single Sign Out request.
+ *
+ * @param unknown_type $variables
+ *   An associative array containing the key, date and logout id request
+ */
+function theme_cas_service_logout_request($ticket, $date, $id) {
+  $output = "<samlp:LogoutRequest xmlns:samlp='urn:oasis:names:tc:SAML:2.0:protocol' ID='$id' Version='2.0' IssueInstant='$date'>\n";
+  $output .= "<saml:NameID xmlns:saml='urn:oasis:names:tc:SAML:2.0:assertion'>@NOT_USED@</saml:NameID>\n";
+  $output .= "<samlp:SessionIndex>$ticket</samlp:SessionIndex>\n";
+  $output .= "</samlp:LogoutRequest>\n";
+  return $output;
+}

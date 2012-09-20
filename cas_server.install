@@ -35,6 +35,11 @@ function cas_server_schema() {
         'type' => 'int',
         'not null' => TRUE,
       ),
+      'valid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 1,
+      ),
     ),
     'primary key' => array('ticket'),
   );
@@ -92,5 +97,14 @@ function cas_server_update_1() {
 
   $ret = array();
   db_create_table($ret, 'cas_server_tickets', $schema['cas_server_tickets']);
+  return $ret;
+}
+
+/**
+ * Adds valid field to indicate when ticket is valid for reuse.
+ */
+function cas_server_update_6301() {
+  $ret = array();
+  db_add_field($ret, 'cas_server_tickets', 'valid', array('type' => 'int', 'not null' => TRUE, 'default' => 1));
   return $ret;
 }
