@@ -127,6 +127,13 @@ function cas_test_login() {
  * Validate a ticket using the CAS 1.x protocol.
  */
 function cas_test_validate() {
+  // Prevent this page from being cached.
+  global $conf;
+  $conf['cache'] = FALSE;
+
+  // Set content type.
+  drupal_set_header('Content-Type: text/plain; charset=utf-8');
+
   //Obtain the ticket from the url and validate it.
   $ticket = $_GET['ticket'];
   $service = $_GET['service'];
@@ -147,10 +154,16 @@ function cas_test_validate() {
  * Validate a ticket using the CAS 2.0 protocol.
  */
 function cas_test_service_validate() {
+  // Prevent this page from being cached.
+  global $conf;
+  $conf['cache'] = FALSE;
+
+  // Set content type.
+  drupal_set_header('Content-Type: text/xml; charset=utf-8');
+
   $ticket = $_GET['ticket'];
   $service = $_GET['service'];
 
-  header('Content-type:', 'text/xml');
   if ($cas_user = _cas_test_ticket_validate($service, $ticket)) {
     print theme('cas_service_validate_success', $cas_user['name'], $cas_user['attributes']);
   }
