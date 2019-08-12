@@ -282,7 +282,15 @@ class ServiceController implements ContainerInjectionInterface {
       }
     }
     catch (CasLoginException $e) {
-      $this->casHelper->log(LogLevel::ERROR, $e->getMessage());
+      // Use an appropiate log level depending on exception type.
+      if (empty($e->getCode()) || $e->getCode() === CasLoginException::ATTRIBUTE_PARSING_ERROR) {
+        $error_level = LogLevel::ERROR;
+      }
+      else {
+        $error_level = LogLevel::INFO;
+      }
+
+      $this->casHelper->log($error_level, $e->getMessage());
       $login_error_message = $this->getLoginErrorMessage($e);
       if ($login_error_message) {
         $this->messenger->addError($login_error_message, 'error');
