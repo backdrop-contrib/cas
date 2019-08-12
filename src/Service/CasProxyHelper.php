@@ -92,6 +92,39 @@ class CasProxyHelper {
   }
 
   /**
+   * Get a proxy ticket using a proxy granting ticket.
+   *
+   * @param string $target_service
+   *   The service to be proxied.
+   *
+   * @return string
+   *   The proxy ticket returned by the CAS server.
+   *
+   * @throws CasProxyException
+   *   Thrown if there was a problem communicating with the CAS server.
+   */
+  public function getProxyTicket($target_service) {
+    if (!($this->settings->get('proxy.initialize') && $this->session->has('cas_pgt'))) {
+      // We can't perform proxy authentication in this state.
+      throw new CasProxyException("Session state not sufficient for proxying.");
+    }
+
+    // Make request to CAS server to retrieve a proxy ticket for this service.
+    $cas_url = $this->getServerProxyUrl($target_service);
+    try {
+      $this->casHelper->log(LogLevel::DEBUG, "Retrieving proxy ticket from %cas_url", array('%cas_url' => $cas_url));
+      $response = $this->httpClient->get($cas_url, ['timeout' => $this->settings->get('advanced.connection_timeout')]);
+    }
+    catch (ClientException $e) {
+      throw new CasProxyException($e->getMessage());
+    }
+    $proxy_ticket = $this->parseProxyTicket($response->getBody());
+    $this->casHelper->log(LogLevel::DEBUG, "Extracted proxy ticket %ticket", array('%ticket' => $proxy_ticket));
+
+    return $proxy_ticket;
+  }
+
+  /**
    * Proxy authenticates to a target service.
    *
    * Returns cookies from the proxied service in a
@@ -122,27 +155,14 @@ class CasProxyHelper {
       return $jar;
     }
 
-    if (!($this->settings->get('proxy.initialize') && $this->session->has('cas_pgt'))) {
-      // We can't perform proxy authentication in this state.
-      throw new CasProxyException("Session state not sufficient for proxying.");
-    }
-
-    // Make request to CAS server to retrieve a proxy ticket for this service.
-    $cas_url = $this->getServerProxyUrl($target_service);
-    try {
-      $this->casHelper->log(LogLevel::DEBUG, "Retrieving proxy ticket from %cas_url", array('%cas_url' => $cas_url));
-      $response = $this->httpClient->get($cas_url, ['timeout' => $this->settings->get('advanced.connection_timeout')]);
-    }
-    catch (ClientException $e) {
-      throw new CasProxyException($e->getMessage());
-    }
-    $proxy_ticket = $this->parseProxyTicket($response->getBody());
-    $this->casHelper->log(LogLevel::DEBUG, "Extracted proxy ticket %ticket", array('%ticket' => $proxy_ticket));
+    // Get proxy ticket and use it to initialize params.
+    $params = [
+      'ticket' => $this->getProxyTicket($target_service),
+    ];
 
     // Make request to target service with our new proxy ticket.
     // The target service will validate this ticket against the CAS server
     // and set a cookie that grants authentication for further resource calls.
-    $params['ticket'] = $proxy_ticket;
     $service_url = $target_service . "?" . UrlHelper::buildQuery($params);
     $cookie_jar = new CookieJar();
     try {
