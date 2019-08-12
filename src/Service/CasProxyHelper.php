@@ -192,7 +192,7 @@ class CasProxyHelper {
    *   Thrown if there was a problem parsing the proxy validation response.
    */
   private function parseProxyTicket($xml) {
-    $dom = new \DomDocument();
+    $dom = new \DOMDocument();
     $dom->preserveWhiteSpace = FALSE;
     $dom->encoding = "utf-8";
     if (@$dom->loadXML($xml) === FALSE) {
