@@ -2,9 +2,11 @@
 
 namespace Drupal\Tests\cas\Unit\Service;
 
+use Drupal\cas\Service\CasHelper;
+use Drupal\Core\Logger\LoggerChannelFactory;
 use Drupal\Tests\UnitTestCase;
 use Psr\Log\LogLevel;
-use Drupal\cas\Service\CasHelper;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * CasHelper unit tests.
@@ -185,6 +187,29 @@ class CasHelperTest extends UnitTestCase {
 
     $cas_helper->log(LogLevel::DEBUG, 'This is a debug log');
     $cas_helper->log(LogLevel::ERROR, 'This is an error log');
+  }
+
+  /**
+   * @covers ::handleReturnToParameter
+   */
+  public function testHandleReturnToParameter() {
+    $config_factory = $this->getConfigFactoryStub([
+      'cas.settings' => [
+        'advanced.debug_log' => FALSE,
+      ],
+    ]);
+    $cas_helper = new CasHelper($config_factory, new LoggerChannelFactory());
+
+    $request = new Request(['returnto' => 'node/1']);
+
+    $this->assertFalse($request->query->has('destination'));
+    $this->assertSame('node/1', $request->query->get('returnto'));
+
+    $cas_helper->handleReturnToParameter($request);
+
+    // Check that the 'returnto' has been copied to 'destination'.
+    $this->assertSame('node/1', $request->query->get('destination'));
+    $this->assertSame('node/1', $request->query->get('returnto'));
   }
 
 }
