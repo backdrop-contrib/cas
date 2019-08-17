@@ -309,7 +309,11 @@ class CasUserManagerTest extends UnitTestCase {
     $this->externalAuth
       ->expects($this->once())
       ->method('register')
-      ->with('test', 'cas', ['mail' => $expected_assigned_email, 'pass' => NULL])
+      ->with('test', 'cas', [
+        'name' => 'test',
+        'mail' => $expected_assigned_email,
+        'pass' => NULL,
+      ])
       ->willReturn($this->account);
 
     $this->externalAuth

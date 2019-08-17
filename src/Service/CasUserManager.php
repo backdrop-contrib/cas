@@ -137,16 +137,24 @@ class CasUserManager {
    *   The CAS username.
    * @param array $property_values
    *   Property values to assign to the user on registration.
-   *
-   * @throws CasLoginException
-   *   When the user account could not be registered.
+   * @param string $local_username
+   *   The local Drupal username to be created.
    *
    * @return \Drupal\user\UserInterface
    *   The user entity of the newly registered user.
+   * @throws \Drupal\cas\Exception\CasLoginException
+   *   When the user account could not be registered.
    */
-  public function register($authname, array $property_values = []) {
+  public function register($authname, array $property_values = [], $local_username = NULL) {
+    if (!$local_username) {
+      @trigger_error('Calling CasUserManager::register() without the $local_username argument is deprecated in cas:8.x-1.6 and the $local_username argument will be required in cas:8.x-2.0.', E_USER_DEPRECATED);
+      $local_username = $authname;
+    }
+
+    $property_values['name'] = $local_username;
+    $property_values['pass'] = $this->randomPassword();
+
     try {
-      $property_values['pass'] = $this->randomPassword();
       $user = $this->externalAuth->register($authname, $this->provider, $property_values);
     }
     catch (ExternalAuthRegisterException $e) {
@@ -185,7 +193,7 @@ class CasUserManager {
         $this->casHelper->log(LogLevel::DEBUG, 'Dispatching EVENT_PRE_REGISTER.');
         $this->eventDispatcher->dispatch(CasHelper::EVENT_PRE_REGISTER, $cas_pre_register_event);
         if ($cas_pre_register_event->getAllowAutomaticRegistration()) {
-          $account = $this->register($cas_pre_register_event->getDrupalUsername(), $cas_pre_register_event->getPropertyValues());
+          $account = $this->register($property_bag->getUsername(), $cas_pre_register_event->getPropertyValues(), $cas_pre_register_event->getDrupalUsername());
         }
         else {
           throw new CasLoginException("Cannot register user, an event listener denied access.", CasLoginException::SUBSCRIBER_DENIED_REG);
