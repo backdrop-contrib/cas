@@ -147,11 +147,11 @@ function _cas_add_cas_username_to_user_form(array &$form) {
     '#access' => \Drupal::currentUser()->hasPermission('administer users'),
     '#maxlength' => 128,
     '#weight' => 0,
-    '#states' => array(
-      'visible' => array(
+    '#states' => [
+      'visible' => [
         ':input[name="cas_enabled"]' => ['checked' => TRUE],
-      ),
-    ),
+      ],
+    ],
   ];
 
   // We cannot apply form validation method directly to buttons on entity forms
@@ -230,11 +230,11 @@ function cas_form_user_login_form_alter(&$form, FormStateInterface $form_state) 
   // Add a link to login via CAS on the user login form.
   $enabled = $config->get('login_link_enabled');
   if ($enabled) {
-    $url = new Url('cas.login', array(), array(
-      'attributes' => array(
-        'class' => array('cas-login-link'),
-      ),
-    ));
+    $url = new Url('cas.login', [], [
+      'attributes' => [
+        'class' => ['cas-login-link'],
+      ],
+    ]);
 
     $form['cas_login_link'] = [
       '#type' => 'link',
@@ -302,7 +302,7 @@ function cas_help($route_name, RouteMatchInterface $route_match) {
         /** @var \Drupal\filter\FilterPluginManager $filter_manager */
         $filter_manager = \Drupal::service('plugin.manager.filter');
         $settings = \Drupal::configFactory()->get('markdown.settings')->getRawData();
-        $config = array('settings' => $settings);
+        $config = ['settings' => $settings];
         $filter = $filter_manager->createInstance('markdown', $config);
         return $filter->process($text, 'en');
       }

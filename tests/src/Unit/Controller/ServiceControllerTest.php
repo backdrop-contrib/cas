@@ -71,24 +71,50 @@ class ServiceControllerTest extends UnitTestCase {
   protected $urlGenerator;
 
   /**
-   * @var \Drupal\Core\Config\ConfigFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+   * The mocked config factory service.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface|\PHPUnit\Framework\MockObject\MockBuilder
    */
   protected $configFactory;
 
+  /**
+   * The mocked request parameter bag.
+   *
+   * @var \Symfony\Component\HttpFoundation\ParameterBag|\PHPUnit\Framework\MockObject\MockObject
+   */
   protected $requestBag;
 
+  /**
+   * The mocked query parameter bag.
+   *
+   * @var \Symfony\Component\HttpFoundation\ParameterBag|\PHPUnit\Framework\MockObject\MockObject
+   */
   protected $queryBag;
 
+  /**
+   * The request object.
+   *
+   * @var \Symfony\Component\HttpFoundation\Request
+   */
   protected $requestObject;
 
+  /**
+   * The mocked messenger service.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
   protected $messenger;
 
   /**
+   * The event dispatcher.
+   *
    * @var \Prophecy\Prophecy\ObjectProphecy
    */
   protected $eventDispatcher;
 
   /**
+   * The external auth service.
+   *
    * @var \Prophecy\Prophecy\ObjectProphecy
    */
   protected $externalAuth;
@@ -115,16 +141,16 @@ class ServiceControllerTest extends UnitTestCase {
     $this->casLogout = $this->getMockBuilder('\Drupal\cas\Service\CasLogout')
       ->disableOriginalConstructor()
       ->getMock();
-    $this->configFactory = $this->getConfigFactoryStub(array(
-      'cas.settings' => array(
+    $this->configFactory = $this->getConfigFactoryStub([
+      'cas.settings' => [
         'server.hostname' => 'example-server.com',
         'server.port' => 443,
         'server.path' => '/cas',
         'error_handling.login_failure_page' => '/user/login',
         'error_handling.message_validation_failure' => '/user/login',
         'login_success_message' => '',
-      ),
-    ));
+      ],
+    ]);
     $this->token = $this->prophesize(Token::class);
     $this->casHelper = new CasHelper($this->configFactory, new LoggerChannelFactory(), $this->token->reveal());
     $this->requestStack = $this->createMock('\Symfony\Component\HttpFoundation\RequestStack');
@@ -140,7 +166,7 @@ class ServiceControllerTest extends UnitTestCase {
       ->setMethods(NULL)
       ->getMock();
     $session = $this->getMockBuilder('\Symfony\Component\HttpFoundation\Session\Session')
-      ->setConstructorArgs(array($storage))
+      ->setConstructorArgs([$storage])
       ->setMethods(NULL)
       ->getMock();
     $session->start();
@@ -320,14 +346,14 @@ class ServiceControllerTest extends UnitTestCase {
       ->method('login')
       ->with($this->equalTo($validation_data), $this->equalTo('ST-foobar'));
 
-    $configFactory = $this->getConfigFactoryStub(array(
-      'cas.settings' => array(
+    $configFactory = $this->getConfigFactoryStub([
+      'cas.settings' => [
         'server.hostname' => 'example-server.com',
         'server.port' => 443,
         'server.path' => '/cas',
         'proxy.initialize' => TRUE,
-      ),
-    ));
+      ],
+    ]);
 
     $serviceController = new ServiceController(
       $this->casHelper,
@@ -525,12 +551,12 @@ class ServiceControllerTest extends UnitTestCase {
    * will turn those params on or off.
    */
   public function parameterDataProvider() {
-    return array(
+    return [
       // "returnto" not set.
-      array(FALSE),
+      [FALSE],
       // "returnto" set.
-      array(TRUE),
-    );
+      [TRUE],
+    ];
   }
 
   /**
@@ -561,7 +587,7 @@ class ServiceControllerTest extends UnitTestCase {
    * Asserts that validation is executed.
    */
   private function assertSuccessfulValidation($returnto, $for_proxy = FALSE) {
-    $service_params = array();
+    $service_params = [];
     if ($returnto) {
       $service_params['returnto'] = 'node/1';
     }
@@ -595,16 +621,16 @@ class ServiceControllerTest extends UnitTestCase {
    */
   private function setupRequestParameters($returnto, $logout_request, $ticket) {
     // Request params.
-    $map = array(
-      array('logoutRequest', $logout_request),
-    );
+    $map = [
+      ['logoutRequest', $logout_request],
+    ];
     $this->requestBag->expects($this->any())
       ->method('has')
       ->will($this->returnValueMap($map));
 
-    $map = array();
+    $map = [];
     if ($logout_request === TRUE) {
-      $map[] = array('logoutRequest', NULL, '<foobar/>');
+      $map[] = ['logoutRequest', NULL, '<foobar/>'];
     }
     if (!empty($map)) {
       $this->requestBag->expects($this->any())
@@ -613,20 +639,20 @@ class ServiceControllerTest extends UnitTestCase {
     }
 
     // Query string params.
-    $map = array(
-      array('returnto', $returnto),
-      array('ticket', $ticket),
-    );
+    $map = [
+      ['returnto', $returnto],
+      ['ticket', $ticket],
+    ];
     $this->queryBag->expects($this->any())
       ->method('has')
       ->will($this->returnValueMap($map));
 
-    $map = array();
+    $map = [];
     if ($returnto === TRUE) {
-      $map[] = array('returnto', NULL, 'node/1');
+      $map[] = ['returnto', NULL, 'node/1'];
     }
     if ($ticket === TRUE) {
-      $map[] = array('ticket', NULL, 'ST-foobar');
+      $map[] = ['ticket', NULL, 'ST-foobar'];
     }
     if (!empty($map)) {
       $this->queryBag->expects($this->any())
@@ -635,7 +661,7 @@ class ServiceControllerTest extends UnitTestCase {
     }
 
     // Query string "all" method should include all params.
-    $all = array();
+    $all = [];
     if ($returnto) {
       $all['returnto'] = 'node/1';
     }

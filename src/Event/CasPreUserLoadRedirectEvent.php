@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  * Potential use cases:
  * - There's a new version of site's 'Terms & Conditions' page. On the first
  *   login after the new version has been published, the user should accept the
- *   new terms or he/she cannot login.
+ *   new terms or they cannot login.
  * - There's no local account and the site is configured with 'auto register'. A
  *   third-party module wants to allow the user to login with the local
  *   credentials so that the CAS account and the Drupal account get paired in

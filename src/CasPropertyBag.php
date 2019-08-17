@@ -135,6 +135,7 @@ class CasPropertyBag {
    *   The name of the attribute.
    *
    * @return mixed|null
+   *   The attribute value, or NULL if it does not exist.
    */
   public function getAttribute($name) {
     return $this->hasAttribute($name) ? $this->attributes[$name] : NULL;
@@ -147,6 +148,7 @@ class CasPropertyBag {
    *   The name of the attribute.
    *
    * @return bool
+   *   TRUE if the attribute exists, FALSE otherwise.
    */
   public function hasAttribute($name) {
     return isset($this->attributes[$name]);

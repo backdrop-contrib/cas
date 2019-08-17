@@ -93,6 +93,11 @@ class CasUserManager {
    */
   protected $eventDispatcher;
 
+  /**
+   * The name of the external auth provider we use.
+   *
+   * @var string
+   */
   protected $provider = 'cas';
 
   /**
@@ -142,6 +147,7 @@ class CasUserManager {
    *
    * @return \Drupal\user\UserInterface
    *   The user entity of the newly registered user.
+   *
    * @throws \Drupal\cas\Exception\CasLoginException
    *   When the user account could not be registered.
    */
@@ -171,7 +177,7 @@ class CasUserManager {
    * @param string $ticket
    *   The service ticket.
    *
-   * @throws CasLoginException
+   * @throws \Drupal\cas\Exception\CasLoginException
    *   Thrown if there was a problem logging in the user.
    */
   public function login(CasPropertyBag $property_bag, $ticket) {
@@ -252,8 +258,8 @@ class CasUserManager {
     if ($this->settings->get('cas.settings')->get('logout.enable_single_logout') === TRUE) {
       $this->connection->insert('cas_login_data')
         ->fields(
-          array('sid', 'plainsid', 'ticket', 'created'),
-          array(Crypt::hashBase64($session_id), $session_id, $ticket, time())
+          ['sid', 'plainsid', 'ticket', 'created'],
+          [Crypt::hashBase64($session_id), $session_id, $ticket, time()]
         )
         ->execute();
     }

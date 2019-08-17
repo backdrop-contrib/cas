@@ -60,10 +60,10 @@ class CasPropertyBagTest extends UnitTestCase {
    */
   public function testSetAttributes() {
     $bag = new CasPropertyBag($this->randomMachineName(8));
-    $attributes = array(
-      'foo' => array('bar'),
-      'baz' => array('quux, foobar'),
-    );
+    $attributes = [
+      'foo' => ['bar'],
+      'baz' => ['quux, foobar'],
+    ];
     $bag->setAttributes($attributes);
     $this->assertEquals($attributes, $this->readAttribute($bag, 'attributes'));
   }
@@ -110,10 +110,10 @@ class CasPropertyBagTest extends UnitTestCase {
     $reflection = new \ReflectionClass($bag);
     $property = $reflection->getProperty('attributes');
     $property->setAccessible(TRUE);
-    $attributes = array(
-      'foo' => array('bar'),
-      'baz' => array('quux', 'foobar'),
-    );
+    $attributes = [
+      'foo' => ['bar'],
+      'baz' => ['quux', 'foobar'],
+    ];
     $property->setValue($bag, $attributes);
     $this->assertEquals($attributes, $bag->getAttributes());
   }

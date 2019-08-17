@@ -78,16 +78,16 @@ class CasHelperTest extends UnitTestCase {
    * @see \Drupal\Tests\cas\Unit\CasHelperTest::testGetServerLoginUrl()
    */
   public function getServerLoginUrlDataProvider() {
-    return array(
-      array(
-        array(),
+    return [
+      [
+        [],
         'https://example.com/client',
-      ),
-      array(
-        array('returnto' => 'node/1'),
+      ],
+      [
+        ['returnto' => 'node/1'],
         'https://example.com/client?returnto=node%2F1',
-      ),
-    );
+      ],
+    ];
   }
 
   /**
@@ -98,14 +98,14 @@ class CasHelperTest extends UnitTestCase {
    */
   public function testGetServerBaseUrl() {
     /** @var \Drupal\Core\Config\ConfigFactory $config_factory */
-    $config_factory = $this->getConfigFactoryStub(array(
-      'cas.settings' => array(
+    $config_factory = $this->getConfigFactoryStub([
+      'cas.settings' => [
         'server.protocol' => 'https',
         'server.hostname' => 'example.com',
         'server.port' => 443,
         'server.path' => '/cas',
-      ),
-    ));
+      ],
+    ]);
     $cas_helper = new CasHelper($config_factory, $this->loggerFactory, $this->token->reveal());
 
     $this->assertEquals('https://example.com/cas/', $cas_helper->getServerBaseUrl());
@@ -121,14 +121,14 @@ class CasHelperTest extends UnitTestCase {
    */
   public function testGetServerBaseUrlNonStandardPort() {
     /** @var \Drupal\Core\Config\ConfigFactory $config_factory */
-    $config_factory = $this->getConfigFactoryStub(array(
-      'cas.settings' => array(
+    $config_factory = $this->getConfigFactoryStub([
+      'cas.settings' => [
         'server.protocol' => 'https',
         'server.hostname' => 'example.com',
         'server.port' => 4433,
         'server.path' => '/cas',
-      ),
-    ));
+      ],
+    ]);
     $cas_helper = new CasHelper($config_factory, $this->loggerFactory, $this->token->reveal());
 
     $this->assertEquals('https://example.com:4433/cas/', $cas_helper->getServerBaseUrl());
@@ -144,14 +144,14 @@ class CasHelperTest extends UnitTestCase {
    */
   public function testGetServerBaseUrlNonStandardHttpProtocol() {
     /** @var \Drupal\Core\Config\ConfigFactory $config_factory */
-    $config_factory = $this->getConfigFactoryStub(array(
-      'cas.settings' => array(
+    $config_factory = $this->getConfigFactoryStub([
+      'cas.settings' => [
         'server.protocol' => 'http',
         'server.hostname' => 'example.com',
         'server.port' => 80,
         'server.path' => '/cas',
-      ),
-    ));
+      ],
+    ]);
     $cas_helper = new CasHelper($config_factory, $this->loggerFactory, $this->token->reveal());
 
     $this->assertEquals('http://example.com/cas/', $cas_helper->getServerBaseUrl());
@@ -165,11 +165,11 @@ class CasHelperTest extends UnitTestCase {
    */
   public function testLogWhenDebugTurnedOn() {
     /** @var \Drupal\Core\Config\ConfigFactory $config_factory */
-    $config_factory = $this->getConfigFactoryStub(array(
-      'cas.settings' => array(
+    $config_factory = $this->getConfigFactoryStub([
+      'cas.settings' => [
         'advanced.debug_log' => TRUE,
-      ),
-    ));
+      ],
+    ]);
     $cas_helper = new CasHelper($config_factory, $this->loggerFactory, $this->token->reveal());
 
     // The actual logger should be called twice.
@@ -188,11 +188,11 @@ class CasHelperTest extends UnitTestCase {
    */
   public function testLogWhenDebugTurnedOff() {
     /** @var \Drupal\Core\Config\ConfigFactory $config_factory */
-    $config_factory = $this->getConfigFactoryStub(array(
-      'cas.settings' => array(
+    $config_factory = $this->getConfigFactoryStub([
+      'cas.settings' => [
         'advanced.debug_log' => FALSE,
-      ),
-    ));
+      ],
+    ]);
     $cas_helper = new CasHelper($config_factory, $this->loggerFactory, $this->token->reveal());
 
     // The actual logger should only called once, when we log an error.
@@ -233,15 +233,15 @@ class CasHelperTest extends UnitTestCase {
    */
   public function testGetMessage() {
     /** @var \Drupal\Core\Config\ConfigFactory $config_factory */
-    $config_factory = $this->getConfigFactoryStub(array(
-      'cas.settings' => array(
+    $config_factory = $this->getConfigFactoryStub([
+      'cas.settings' => [
         'arbitrary_message' => 'Use <a href="[cas:login-url]">CAS login</a>',
         'messages' => [
           'empty_message' => '',
           'do_not_trust_user_input' => '<script>alert("Hacked!");</script>',
         ],
-      ),
-    ));
+      ],
+    ]);
     $cas_helper = new CasHelper($config_factory, $this->loggerFactory, $this->token->reveal());
 
     $message = $cas_helper->getMessage('arbitrary_message');

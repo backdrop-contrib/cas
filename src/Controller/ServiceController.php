@@ -12,7 +12,6 @@ use Drupal\cas\Service\CasUserManager;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
-use Drupal\Core\TempStore\PrivateTempStoreFactory;
 use Drupal\Core\Url;
 use Drupal\externalauth\ExternalAuthInterface;
 use Psr\Log\LogLevel;

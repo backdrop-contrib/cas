@@ -65,7 +65,7 @@ class CasValidator {
    *   The configuration factory.
    * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
    *   The URL generator.
-  *  @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The EventDispatcher service.
    */
   public function __construct(Client $http_client, CasHelper $cas_helper, ConfigFactoryInterface $config_factory, UrlGeneratorInterface $url_generator, EventDispatcherInterface $event_dispatcher) {
@@ -90,12 +90,12 @@ class CasValidator {
    * @return \Drupal\cas\CasPropertyBag
    *   Contains user info from the CAS server.
    *
-   * @throws CasValidateException
+   * @throws \Drupal\cas\Exception\CasValidateException
    *   Thrown if there was a problem making the validation request or
    *   if there was a local configuration issue.
    */
-  public function validateTicket($ticket, array $service_params = array()) {
-    $options = array();
+  public function validateTicket($ticket, array $service_params = []) {
+    $options = [];
     $verify = $this->settings->get('server.verify');
     switch ($verify) {
       case CasHelper::CA_CUSTOM:
@@ -162,7 +162,7 @@ class CasValidator {
    * @return \Drupal\cas\CasPropertyBag
    *   Contains user info from the CAS server.
    *
-   * @throws CasValidateException
+   * @throws \Drupal\cas\Exception\CasValidateException
    *   Thrown if there was a problem parsing the validation data.
    */
   private function validateVersion1($data) {
@@ -193,7 +193,7 @@ class CasValidator {
    * @return \Drupal\cas\CasPropertyBag
    *   Contains user info from the CAS server.
    *
-   * @throws CasValidateException
+   * @throws \Drupal\cas\Exception\CasValidateException
    *   Thrown if there was a problem parsing the validation data.
    */
   private function validateVersion2($data) {
@@ -276,7 +276,7 @@ class CasValidator {
    * @param \DOMNodeList $proxy_chain
    *   An XML element containing proxy values, from most recent to first.
    *
-   * @throws CasValidateException
+   * @throws \Drupal\cas\Exception\CasValidateException
    *   Thrown if the proxy chain did not match the allowed list from settings.
    */
   private function verifyProxyChain(\DOMNodeList $proxy_chain) {
@@ -345,7 +345,7 @@ class CasValidator {
    *   expressions for a URL in the chain.
    */
   private function parseAllowedProxyChains($proxy_chains) {
-    $chain_list = array();
+    $chain_list = [];
 
     // Split configuration string on vertical whitespace.
     $chains = preg_split('/\v/', $proxy_chains, NULL, PREG_SPLIT_NO_EMPTY);
@@ -370,7 +370,7 @@ class CasValidator {
    *   An array of proxy values, from most recent to first.
    */
   private function parseServerProxyChain(\DOMNodeList $xml_list) {
-    $proxies = array();
+    $proxies = [];
     // Loop through the DOMNodeList, adding each proxy to the list.
     foreach ($xml_list as $node) {
       $proxies[] = $node->nodeValue;
@@ -388,7 +388,7 @@ class CasValidator {
    *   An associative array of attributes.
    */
   private function parseAttributes(\DOMNodeList $xml_list) {
-    $attributes = array();
+    $attributes = [];
     $node = $xml_list->item(0);
     foreach ($node->childNodes as $child) {
       $name = $child->localName;
@@ -414,7 +414,7 @@ class CasValidator {
    * @return string
    *   The fully constructed validation URL.
    */
-  public function getServerValidateUrl($ticket, array $service_params = array()) {
+  public function getServerValidateUrl($ticket, array $service_params = []) {
     $validate_url = $this->casHelper->getServerBaseUrl();
     $path = '';
     switch ($this->settings->get('server.version')) {
@@ -441,8 +441,7 @@ class CasValidator {
         break;
     }
 
-
-    $params = array();
+    $params = [];
     $params['service'] = $this->urlGenerator->generate('cas.service', $service_params, UrlGeneratorInterface::ABSOLUTE_URL);
     $params['ticket'] = $ticket;
     if ($this->settings->get('proxy.initialize')) {
@@ -469,9 +468,9 @@ class CasValidator {
    *   The pgtCallbackURL, fully formatted.
    */
   private function formatProxyCallbackUrl() {
-    return str_replace('http://', 'https://', $this->urlGenerator->generateFromRoute('cas.proxyCallback', array(), array(
+    return str_replace('http://', 'https://', $this->urlGenerator->generateFromRoute('cas.proxyCallback', [], [
       'absolute' => TRUE,
-    )));
+    ]));
   }
 
 }

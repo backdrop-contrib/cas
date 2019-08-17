@@ -62,7 +62,7 @@ class CasUserInteractionTest extends BrowserTestBase {
     $this->assertUserNotLoggedIn();
     $this->assertSession()->pageTextContains("I agree with the 'Legal Notice'");
 
-    // The user doesn't check he "I agree..." checkbox. Form doesn't validate.
+    // The user doesn't check the "I agree..." checkbox. Form doesn't validate.
     $page = $this->getSession()->getPage();
     $page->pressButton('I agree');
     $this->assertSession()->pageTextContains("I agree with the 'Legal Notice' field is required.");

@@ -11,6 +11,11 @@ use Drupal\cas\CasPropertyBag;
  */
 class CasEventsTest extends CasBrowserTestBase {
 
+  /**
+   * The modules to enable.
+   *
+   * @var array
+   */
   public static $modules = ['cas', 'cas_test'];
 
   /**

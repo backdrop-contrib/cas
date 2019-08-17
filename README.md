@@ -140,7 +140,8 @@ automatically log them in via CAS.
 
 To enable this behavior, enable the r4032login module and configure it as such:
 
-1. Check the "Redirect user to the page they tried to access after login" checkbox
+1. Check the "Redirect user to the page they tried to access after login"
+   checkbox
 1. Set the "Path to user login form" to "/cas"
 1. Set the "Destination parameter override" to "returnto"
 
