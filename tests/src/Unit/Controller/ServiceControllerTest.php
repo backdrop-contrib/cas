@@ -527,8 +527,8 @@ class ServiceControllerTest extends UnitTestCase {
     // Service controller calls Url:: methods directly, since there's no
     // existing service class to use instead of that. This makes unit testing
     // hard. We need to place mock services that Url:: uses in the container.
-    $path_validator = $this->getMock('Drupal\Core\Path\PathValidatorInterface');
-    $unrouted_url_assember = $this->getMock('Drupal\Core\Utility\UnroutedUrlAssemblerInterface');
+    $path_validator = $this->createMock('Drupal\Core\Path\PathValidatorInterface');
+    $unrouted_url_assember = $this->createMock('Drupal\Core\Utility\UnroutedUrlAssemblerInterface');
     $unrouted_url_assember
       ->expects($this->atLeastOnce())
       ->method('assemble')
