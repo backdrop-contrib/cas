@@ -3,7 +3,9 @@
 namespace Drupal\Tests\cas\Unit\Service;
 
 use Drupal\cas\Service\CasHelper;
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Logger\LoggerChannelFactory;
+use Drupal\Core\Utility\Token;
 use Drupal\Tests\UnitTestCase;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,6 +42,13 @@ class CasHelperTest extends UnitTestCase {
   protected $loggerChannel;
 
   /**
+   * The token service.
+   *
+   * @var \Prophecy\Prophecy\ObjectProphecy
+   */
+  protected $token;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
@@ -53,6 +62,11 @@ class CasHelperTest extends UnitTestCase {
       ->method('get')
       ->with('cas')
       ->will($this->returnValue($this->loggerChannel));
+    $this->token = $this->prophesize(Token::class);
+    $this->token->replace('Use <a href="[cas:login-url]">CAS login</a>')
+      ->willReturn('Use <a href="/caslogin">CAS login</a>');
+    $this->token->replace('<script>alert("Hacked!");</script>')
+      ->willReturn('<script>alert("Hacked!");</script>');
   }
 
   /**
@@ -92,7 +106,7 @@ class CasHelperTest extends UnitTestCase {
         'server.path' => '/cas',
       ),
     ));
-    $cas_helper = new CasHelper($config_factory, $this->loggerFactory);
+    $cas_helper = new CasHelper($config_factory, $this->loggerFactory, $this->token->reveal());
 
     $this->assertEquals('https://example.com/cas/', $cas_helper->getServerBaseUrl());
   }
@@ -115,7 +129,7 @@ class CasHelperTest extends UnitTestCase {
         'server.path' => '/cas',
       ),
     ));
-    $cas_helper = new CasHelper($config_factory, $this->loggerFactory);
+    $cas_helper = new CasHelper($config_factory, $this->loggerFactory, $this->token->reveal());
 
     $this->assertEquals('https://example.com:4433/cas/', $cas_helper->getServerBaseUrl());
   }
@@ -138,7 +152,7 @@ class CasHelperTest extends UnitTestCase {
         'server.path' => '/cas',
       ),
     ));
-    $cas_helper = new CasHelper($config_factory, $this->loggerFactory);
+    $cas_helper = new CasHelper($config_factory, $this->loggerFactory, $this->token->reveal());
 
     $this->assertEquals('http://example.com/cas/', $cas_helper->getServerBaseUrl());
   }
@@ -156,7 +170,7 @@ class CasHelperTest extends UnitTestCase {
         'advanced.debug_log' => TRUE,
       ),
     ));
-    $cas_helper = new CasHelper($config_factory, $this->loggerFactory);
+    $cas_helper = new CasHelper($config_factory, $this->loggerFactory, $this->token->reveal());
 
     // The actual logger should be called twice.
     $this->loggerChannel->expects($this->exactly(2))
@@ -179,7 +193,7 @@ class CasHelperTest extends UnitTestCase {
         'advanced.debug_log' => FALSE,
       ),
     ));
-    $cas_helper = new CasHelper($config_factory, $this->loggerFactory);
+    $cas_helper = new CasHelper($config_factory, $this->loggerFactory, $this->token->reveal());
 
     // The actual logger should only called once, when we log an error.
     $this->loggerChannel->expects($this->once())
@@ -198,7 +212,7 @@ class CasHelperTest extends UnitTestCase {
         'advanced.debug_log' => FALSE,
       ],
     ]);
-    $cas_helper = new CasHelper($config_factory, new LoggerChannelFactory());
+    $cas_helper = new CasHelper($config_factory, new LoggerChannelFactory(), $this->token->reveal());
 
     $request = new Request(['returnto' => 'node/1']);
 
@@ -210,6 +224,38 @@ class CasHelperTest extends UnitTestCase {
     // Check that the 'returnto' has been copied to 'destination'.
     $this->assertSame('node/1', $request->query->get('destination'));
     $this->assertSame('node/1', $request->query->get('returnto'));
+  }
+
+  /**
+   * Tests the message generator.
+   *
+   * @covers ::getMessage
+   */
+  public function testGetMessage() {
+    /** @var \Drupal\Core\Config\ConfigFactory $config_factory */
+    $config_factory = $this->getConfigFactoryStub(array(
+      'cas.settings' => array(
+        'arbitrary_message' => 'Use <a href="[cas:login-url]">CAS login</a>',
+        'messages' => [
+          'empty_message' => '',
+          'do_not_trust_user_input' => '<script>alert("Hacked!");</script>',
+        ],
+      ),
+    ));
+    $cas_helper = new CasHelper($config_factory, $this->loggerFactory, $this->token->reveal());
+
+    $message = $cas_helper->getMessage('arbitrary_message');
+    $this->assertInstanceOf(FormattableMarkup::class, $message);
+    $this->assertEquals('Use <a href="/caslogin">CAS login</a>', $message);
+
+    // Empty message.
+    $message = $cas_helper->getMessage('messages.empty_message');
+    $this->assertSame('', $message);
+
+    // Check hacker entered message.
+    $message = $cas_helper->getMessage('messages.do_not_trust_user_input');
+    // Check that the dangerous tags were stripped-out.
+    $this->assertEquals('alert("Hacked!");', $message);
   }
 
 }

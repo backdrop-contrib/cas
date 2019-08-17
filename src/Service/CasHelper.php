@@ -2,8 +2,11 @@
 
 namespace Drupal\cas\Service;
 
+use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\Core\Utility\Token;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -123,16 +126,26 @@ class CasHelper {
   protected $loggerChannel;
 
   /**
+   * The token service.
+   *
+   * @var \Drupal\Core\Utility\Token
+   */
+  protected $token;
+
+  /**
    * Constructor.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The configuration factory.
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    *   The logger channel factory.
+   * @param \Drupal\Core\Utility\Token $token
+   *   The token service.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory) {
+  public function __construct(ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory, Token $token) {
     $this->settings = $config_factory->get('cas.settings');
     $this->loggerChannel = $logger_factory->get('cas');
+    $this->token = $token;
   }
 
   /**
@@ -207,6 +220,33 @@ class CasHelper {
       $this->log(LogLevel::DEBUG, "Converting query parameter 'returnto' to 'destination'.");
       $request->query->set('destination', $request->query->get('returnto'));
     }
+  }
+
+  /**
+   * Returns a translated configurable message given the message config key.
+   *
+   * @param string $key
+   *   The message config key.
+   *
+   * @return \Drupal\Component\Render\MarkupInterface|string
+   *   The customized message or an empty string.
+   *
+   * @throws \InvalidArgumentException
+   *   If the passed key don't match a config entry.
+   */
+  public function getMessage($key) {
+    assert($key && is_string($key));
+    $message = $this->settings->get($key);
+    if ($message === NULL || !is_string($message)) {
+      throw new \InvalidArgumentException("Invalid key '$key'");
+    }
+
+    // Empty string.
+    if (!$message) {
+      return '';
+    }
+
+    return new FormattableMarkup(Xss::filter($this->token->replace($message)), []);
   }
 
 }

@@ -11,6 +11,7 @@ use Drupal\cas\Service\CasHelper;
 use Drupal\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Logger\LoggerChannelFactory;
+use Drupal\Core\Utility\Token;
 use Drupal\externalauth\ExternalAuthInterface;
 use Drupal\Tests\UnitTestCase;
 use Prophecy\Argument;
@@ -93,6 +94,13 @@ class ServiceControllerTest extends UnitTestCase {
   protected $externalAuth;
 
   /**
+   * The token service.
+   *
+   * @var \Prophecy\Prophecy\ObjectProphecy
+   */
+  protected $token;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
@@ -113,9 +121,12 @@ class ServiceControllerTest extends UnitTestCase {
         'server.port' => 443,
         'server.path' => '/cas',
         'error_handling.login_failure_page' => '/user/login',
+        'error_handling.message_validation_failure' => '/user/login',
+        'login_success_message' => '',
       ),
     ));
-    $this->casHelper = new CasHelper($this->configFactory, new LoggerChannelFactory());
+    $this->token = $this->prophesize(Token::class);
+    $this->casHelper = new CasHelper($this->configFactory, new LoggerChannelFactory(), $this->token->reveal());
     $this->requestStack = $this->createMock('\Symfony\Component\HttpFoundation\RequestStack');
     $this->urlGenerator = $this->createMock('\Drupal\Core\Routing\UrlGeneratorInterface');
 

@@ -6,7 +6,7 @@ services:
       - { name: 'event_subscriber' }
   cas.helper:
     class: Drupal\cas\Service\CasHelper
-    arguments: ['@config.factory', '@logger.factory']
+    arguments: ['@config.factory', '@logger.factory', '@token']
   cas.redirector:
     class: Drupal\cas\Service\CasRedirector
     arguments: ['@cas.helper', '@event_dispatcher', '@url_generator.non_bubbling']

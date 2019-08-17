@@ -231,7 +231,7 @@ class ServiceController implements ContainerInjectionInterface {
         'Error when validating ticket: %error',
         ['%error' => $e->getMessage()]
       );
-      $message_validation_failure = $this->settings->get('error_handling.message_validation_failure');
+      $message_validation_failure = $this->casHelper->getMessage('error_handling.message_validation_failure');
       if (!empty($message_validation_failure)) {
         $this->messenger->addError($message_validation_failure);
       }
@@ -276,7 +276,7 @@ class ServiceController implements ContainerInjectionInterface {
     try {
       $this->casUserManager->login($cas_validation_info, $ticket);
 
-      $login_success_message = $this->settings->get('login_success_message');
+      $login_success_message = $this->casHelper->getMessage('login_success_message');
       if (!empty($login_success_message)) {
         $this->messenger->addStatus($login_success_message);
       }
@@ -371,7 +371,10 @@ class ServiceController implements ContainerInjectionInterface {
     }
 
     if (!empty($msgKey)) {
-      return $this->settings->get('error_handling.' . $msgKey);
+      $message = $this->casHelper->getMessage('error_handling.' . $msgKey);
+      if ($message) {
+        return $message;
+      }
     }
 
     return $this->t('There was a problem logging in. Please contact a site administrator.');

@@ -4,6 +4,7 @@ namespace Drupal\cas\Form;
 
 use Drupal\cas\Service\CasUserManager;
 use Drupal\Component\Plugin\Factory\FactoryInterface;
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
@@ -306,6 +307,17 @@ class CasSettings extends ConfigFormBase {
       '#type' => 'fieldset',
       '#title' => $this->t('Error messages'),
     ];
+    $form['error_handling']['messages']['help'] = [
+      [
+        '#markup' => $this->t('Replacement tokens can be used to customize the messages.'),
+      ],
+    ];
+    if (!$this->moduleHandler->moduleExists('token')) {
+      $form['error_handling']['messages']['help'][] = [
+        '#prefix' => ' ',
+        '#markup' => $this->t('Install the <a href="https://www.drupal.org/project/token">Token</a> module to see what tokens are available.'),
+      ];
+    }
     $form['error_handling']['messages']['message_validation_failure'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Ticket validation failure'),
@@ -342,6 +354,43 @@ class CasSettings extends ConfigFormBase {
       '#description' => $this->t('Displayed when automatic registraton of new user fails because an existing Drupal user is using the same username.'),
       '#default_value' => $config->get('error_handling.message_username_already_exists'),
     ];
+    $form['error_handling']['messages']['message_prevent_normal_login'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Prevent normal login error message'),
+      '#description' => $this->t('Displayed when prevent normal login for CAS users is on and a CAS user tries to logon using the normal Drupal login form.'),
+      '#default_value' => $config->get('error_handling.message_prevent_normal_login'),
+      '#maxlength' => 512,
+      '#states' => [
+        'disabled' => [
+          ':input[name="user_accounts[prevent_normal_login]"]' => [
+            'checked' => FALSE,
+          ],
+        ],
+      ],
+    ];
+    $form['error_handling']['messages']['message_restrict_password_management'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Restrict password management error message'),
+      '#description' => $this->t('Displayed when restrict password management is on and a CAS user tries to reset their Drupal password.'),
+      '#default_value' => $config->get('error_handling.message_restrict_password_management'),
+      '#maxlength' => 512,
+      '#states' => [
+        'disabled' => [
+          ':input[name="user_accounts[restrict_password_management]"]' => [
+            'checked' => FALSE,
+          ],
+        ],
+      ],
+    ];
+
+    if ($this->moduleHandler->moduleExists('token')) {
+      $form['error_handling']['messages']['tokens'] = [
+        '#theme' => 'token_tree_link',
+        '#token_types' => ['cas'],
+        '#global_types' => TRUE,
+        '#dialog' => TRUE,
+      ];
+    }
 
     $form['gateway'] = array(
       '#type' => 'details',
@@ -623,7 +672,9 @@ class CasSettings extends ConfigFormBase {
       ->set('error_handling.message_subscriber_denied_reg', trim($messages['message_subscriber_denied_reg']))
       ->set('error_handling.message_subscriber_denied_login', trim($messages['message_subscriber_denied_login']))
       ->set('error_handling.message_account_blocked', trim($messages['message_account_blocked']))
-      ->set('error_handling.message_username_already_exists', trim($messages['message_username_already_exists']));
+      ->set('error_handling.message_username_already_exists', trim($messages['message_username_already_exists']))
+      ->set('error_handling.message_prevent_normal_login', trim($messages['message_prevent_normal_login']))
+      ->set('error_handling.message_restrict_password_management', trim($messages['message_restrict_password_management']));
 
     $config
       ->set('advanced.debug_log', $form_state->getValue(['advanced', 'debug_log']))

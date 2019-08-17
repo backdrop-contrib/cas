@@ -83,6 +83,15 @@ class CasAdminSettingsTest extends BrowserTestBase {
     $this->assertSession()->addressEquals('user/password');
     $this->assertSession()->pageTextContains(t('The requested account is associated with CAS and its password cannot be managed from this website.'));
 
+    // Test a customized error message.
+    $this->config('cas.settings')
+      ->set('error_handling.message_restrict_password_management', 'You cannot manage your password. Back to <a href="[site:url]">homepage</a>.')
+      ->save();
+
+    $this->getSession()->reload();
+    $this->assertSession()->pageTextContains('You cannot manage your password. Back to homepage.');
+    $this->assertSession()->linkExists('homepage');
+
     $this->drupalPostForm('/user/password', ['name' => 'user_without_cas'], 'Submit');
     $this->assertSession()->addressEquals('user/login');
     $this->assertSession()->pageTextContains(t('Further instructions have been sent to your email address.'));
