@@ -4,6 +4,6 @@ type: module
 core: 8.x
 configure: cas.settings
 dependencies:
-  - externalauth:externalauth
+  - externalauth:externalauth (>= 1.2)
 test_dependencies:
   - cas_mock_server:cas_mock_server
