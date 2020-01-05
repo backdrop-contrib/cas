@@ -42,3 +42,12 @@ services:
     arguments: ['@config.factory']
     tags:
       - { name: 'event_subscriber' }
+  cas.route_subscriber:
+    class: Drupal\cas\Subscriber\CasRouteSubscriber
+    tags:
+      - { name: event_subscriber }
+  cas.cas_user_access_checker:
+    class: Drupal\cas\Access\CasUserAccessCheck
+    arguments: ['@config.factory', '@cas.user_manager']
+    tags:
+      - { name: access_check, applies_to: _cas_user_access }
