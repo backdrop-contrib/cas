@@ -249,4 +249,33 @@ class CasHelper {
     return new FormattableMarkup(Xss::filter($this->token->replace($message)), []);
   }
 
+  /**
+   * Gets config data for guzzle communications with the CAS server.
+   *
+   * @return array
+   *   The guzzle connection options.
+   */
+  public function getCasServerConnectionOptions() {
+    $options = [];
+    $verify = $this->settings->get('server.verify');
+    switch ($verify) {
+      case CasHelper::CA_CUSTOM:
+        $cert = $this->settings->get('server.cert');
+        $options['verify'] = $cert;
+        break;
+
+      case CasHelper::CA_NONE:
+        $options['verify'] = FALSE;
+        break;
+
+      case CasHelper::CA_DEFAULT:
+      default:
+        $options['verify'] = TRUE;
+    }
+
+    $options['timeout'] = $this->settings->get('advanced.connection_timeout');
+
+    return $options;
+  }
+
 }

@@ -258,4 +258,55 @@ class CasHelperTest extends UnitTestCase {
     $this->assertEquals('alert("Hacked!");', $message);
   }
 
+  /**
+   * Tests getCasServerConnectionOptions returns correct data.
+   *
+   * @dataProvider casServerConnectionOptionsDataProvider
+   */
+  public function testCasServerConnectionOptions($ssl_verification) {
+    $configFactory = $this->getConfigFactoryStub([
+      'cas.settings' => [
+        'server.hostname' => 'example.com',
+        'server.port' => 443,
+        'server.path' => '/cas',
+        'server.version' => '1.0',
+        'server.verify' => $ssl_verification,
+        'server.cert' => 'foo',
+        'advanced.connection_timeout' => 30,
+      ],
+    ]);
+    $cas_helper = new CasHelper($configFactory, $this->loggerFactory, $this->token->reveal());
+
+    $options = $cas_helper->getCasServerConnectionOptions();
+
+    $this->assertEquals(30, $options['timeout']);
+
+    switch ($ssl_verification) {
+      case CasHelper::CA_CUSTOM:
+        $this->assertEquals('foo', $options['verify']);
+        break;
+
+      case CasHelper::CA_NONE:
+        $this->assertEquals(FALSE, $options['verify']);
+        break;
+
+      default:
+        $this->assertEquals(TRUE, $options['verify']);
+    }
+  }
+
+  /**
+   * Data provider for casServerConnectionOptionsDataProvider.
+   *
+   * @return array
+   *   The data to provide.
+   */
+  public function casServerConnectionOptionsDataProvider() {
+    return [
+      [CasHelper::CA_NONE],
+      [CasHelper::CA_CUSTOM],
+      [CasHelper::CA_DEFAULT],
+    ];
+  }
+
 }

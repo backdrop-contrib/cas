@@ -95,26 +95,6 @@ class CasValidator {
    *   if there was a local configuration issue.
    */
   public function validateTicket($ticket, array $service_params = []) {
-    $options = [];
-    $verify = $this->settings->get('server.verify');
-    switch ($verify) {
-      case CasHelper::CA_CUSTOM:
-        $cert = $this->settings->get('server.cert');
-        $options['verify'] = $cert;
-        break;
-
-      case CasHelper::CA_NONE:
-        $options['verify'] = FALSE;
-        break;
-
-      case CasHelper::CA_DEFAULT:
-      default:
-        // This triggers for CasHelper::CA_DEFAULT.
-        $options['verify'] = TRUE;
-    }
-
-    $options['timeout'] = $this->settings->get('advanced.connection_timeout');
-
     $validate_url = $this->getServerValidateUrl($ticket, $service_params);
     $this->casHelper->log(
       LogLevel::DEBUG,
@@ -123,7 +103,7 @@ class CasValidator {
     );
 
     try {
-      $response = $this->httpClient->get($validate_url, $options);
+      $response = $this->httpClient->get($validate_url, $this->casHelper->getCasServerConnectionOptions());
       $response_data = $response->getBody()->__toString();
       $this->casHelper->log(LogLevel::DEBUG, "Validation response received from CAS server: %data", ['%data' => $response_data]);
     }

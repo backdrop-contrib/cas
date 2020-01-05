@@ -122,22 +122,6 @@ class CasValidatorTest extends UnitTestCase {
     $property_bag = $casValidator->validateTicket($ticket);
 
     $this->assertEquals($username, $property_bag->getUsername());
-
-    // Test that we sent the correct ssl option to the http client.
-    foreach ($transactions as $transaction) {
-      switch ($ssl_verification) {
-        case CasHelper::CA_CUSTOM:
-          $this->assertEquals('foo', $transaction['options']['verify']);
-          break;
-
-        case CasHelper::CA_NONE:
-          $this->assertEquals(FALSE, $transaction['options']['verify']);
-          break;
-
-        default:
-          $this->assertEquals(TRUE, $transaction['options']['verify']);
-      }
-    }
   }
 
   /**

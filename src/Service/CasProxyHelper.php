@@ -113,7 +113,7 @@ class CasProxyHelper {
     $cas_url = $this->getServerProxyUrl($target_service);
     try {
       $this->casHelper->log(LogLevel::DEBUG, "Retrieving proxy ticket from %cas_url", ['%cas_url' => $cas_url]);
-      $response = $this->httpClient->get($cas_url, ['timeout' => $this->settings->get('advanced.connection_timeout')]);
+      $response = $this->httpClient->get($cas_url, $this->casHelper->getCasServerConnectionOptions());
     }
     catch (ClientException $e) {
       throw new CasProxyException($e->getMessage());
