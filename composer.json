@@ -36,7 +36,7 @@
     "drupal/externalauth": "^1.2"
   },
   "require-dev": {
-    "drupal/cas_mock_server": "dev-0.x"
+    "drupal/cas_mock_server": "^1.0|dev-0.x"
   },
   "extra": {
     "drush": {
