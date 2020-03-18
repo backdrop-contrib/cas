@@ -228,7 +228,8 @@ class CasUserManager {
     $account->save();
 
     if (!$pre_login_event->getAllowLogin()) {
-      throw new CasLoginException("Cannot login, an event listener denied access.", CasLoginException::SUBSCRIBER_DENIED_LOGIN);
+      $reason = $pre_login_event->getCancelLoginReason();
+      throw (new CasLoginException('Cannot login, an event listener denied access.', CasLoginException::SUBSCRIBER_DENIED_LOGIN))->setSubscriberCancelReason($reason);
     }
 
     $this->externalAuth->userLoginFinalize($account, $property_bag->getUsername(), $this->provider);

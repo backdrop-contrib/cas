@@ -374,7 +374,7 @@ class CasUserManagerTest extends UnitTestCase {
       ->method('dispatch')
       ->willReturnCallback(function ($event_type, $event) {
         if ($event instanceof CasPreLoginEvent) {
-          $event->setAllowLogin(FALSE);
+          $event->cancelLogin();
         }
       });
 
