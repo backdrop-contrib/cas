@@ -280,7 +280,7 @@ class CasValidatorTest extends UnitTestCase {
 
     $casValidator = new CasValidator($httpClient, $casHelper, $configFactory, $urlGenerator, $this->eventDispatcher);
 
-    $this->setExpectedException($exception, $exception_message);
+    $this->expectException($exception, $exception_message);
     $ticket = $this->randomMachineName(24);
     $casValidator->validateTicket($ticket, []);
   }

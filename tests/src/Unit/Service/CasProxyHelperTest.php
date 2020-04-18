@@ -229,7 +229,7 @@ class CasProxyHelperTest extends UnitTestCase {
     $httpClient = new Client(['handler' => $handler]);
 
     $casProxyHelper = new CasProxyHelper($httpClient, $this->casHelper, $this->session, $configFactory, $this->database);
-    $this->setExpectedException($exception_type, $exception_message);
+    $this->expectException($exception_type, $exception_message);
     $casProxyHelper->proxyAuthenticate($target_service);
 
   }
