@@ -10,13 +10,6 @@ namespace Drupal\Tests\cas\Functional;
 class CasBulkAddCasUsersTest extends CasBrowserTestBase {
 
   /**
-   * The modules to enable.
-   *
-   * @var array
-   */
-  public static $modules = ['cas'];
-
-  /**
    * Tests the bulk add form.
    */
   public function testBulkAddForm() {

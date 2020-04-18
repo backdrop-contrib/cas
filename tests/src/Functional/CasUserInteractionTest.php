@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\cas\Functional;
 
-use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\cas\Traits\CasTestTrait;
 
 /**
@@ -10,7 +9,7 @@ use Drupal\Tests\cas\Traits\CasTestTrait;
  *
  * @group cas
  */
-class CasUserInteractionTest extends BrowserTestBase {
+class CasUserInteractionTest extends CasBrowserTestBase {
 
   use CasTestTrait {
     casLogin as traitCasLogin;
@@ -19,7 +18,7 @@ class CasUserInteractionTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [
+  public static $modules = [
     'block',
     'cas',
     'cas_mock_server',
