@@ -6,6 +6,9 @@ use Drupal\cas\Exception\CasLoginException;
 use Drupal\cas\Service\CasUserManager;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Markup;
+use Drupal\node\Entity\Node;
+use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
 
 /**
@@ -136,15 +139,15 @@ class BulkAddCasUsers extends FormBase {
     }
 
     try {
-      $cas_user_manager->register($cas_username, $user_properties, $cas_username);
+      /** @var \Drupal\user\UserInterface $user */
+      $user = $cas_user_manager->register($cas_username, $user_properties, $cas_username);
+      $context['results']['messages']['created'][] = $user->toLink()->toString();
     }
     catch (CasLoginException $e) {
       \Drupal::logger('cas')->error('CasLoginException when registering user with name %name: %e', ['%name' => $cas_username, '%e' => $e->getMessage()]);
       $context['results']['messages']['errors'][] = $cas_username;
       return;
     }
-
-    $context['results']['messages']['created'][] = $cas_username;
   }
 
   /**
@@ -170,9 +173,10 @@ class BulkAddCasUsers extends FormBase {
         ));
       }
       if (!empty($results['messages']['created'])) {
+        $userLinks = Markup::create(implode(', ', $results['messages']['created']));
         $messenger->addStatus(t(
           'Successfully created accounts for the following usernames: %usernames',
-          ['%usernames' => implode(', ', $results['messages']['created'])]
+          ['%usernames' => $userLinks]
         ));
       }
     }
