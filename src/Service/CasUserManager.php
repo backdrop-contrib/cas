@@ -276,7 +276,7 @@ class CasUserManager {
    *   The CAS username if it exists, or FALSE otherwise.
    */
   public function getCasUsernameForAccount($uid) {
-    return $this->authmap->get($uid, 'cas');
+    return $this->authmap->get($uid, $this->provider);
   }
 
   /**
@@ -289,7 +289,7 @@ class CasUserManager {
    *   The uid of the user associated with the $cas_username, FALSE otherwise.
    */
   public function getUidForCasUsername($cas_username) {
-    return $this->authmap->getUid($cas_username, 'cas');
+    return $this->authmap->getUid($cas_username, $this->provider);
   }
 
   /**
@@ -301,7 +301,7 @@ class CasUserManager {
    *   The CAS username.
    */
   public function setCasUsernameForAccount(UserInterface $account, $cas_username) {
-    $this->authmap->save($account, 'cas', $cas_username);
+    $this->authmap->save($account, $this->provider, $cas_username);
   }
 
   /**

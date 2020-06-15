@@ -130,11 +130,6 @@ class CasProxyHelperTest extends UnitTestCase {
       ]);
       $casProxyHelper = new CasProxyHelper($httpClient, $this->casHelper, $this->session, $configFactory, $this->database);
 
-      // The casHelper expects to be called for a few things.
-      $this->casHelper->expects($this->once())
-        ->method('getServerBaseUrl')
-        ->will($this->returnValue('https://example-server.com/cas/'));
-
       $jar = $casProxyHelper->proxyAuthenticate($target_service);
       $this->assertEquals('SESSION', $this->session->get('cas_proxy_helper')[$target_service][0]['Name']);
       $this->assertEquals($cookie_value, $this->session->get('cas_proxy_helper')[$target_service][0]['Value']);
@@ -196,10 +191,6 @@ class CasProxyHelperTest extends UnitTestCase {
     }
     // Set up properties so the http client callback knows about them.
     $cookie_value = $this->randomMachineName(24);
-
-    $this->casHelper->expects($this->any())
-      ->method('getServerBaseUrl')
-      ->will($this->returnValue('https://example-server.com/cas/'));
 
     $configFactory = $this->getConfigFactoryStub([
       'cas.settings' => [
