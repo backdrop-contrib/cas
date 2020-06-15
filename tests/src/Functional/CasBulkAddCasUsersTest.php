@@ -52,7 +52,7 @@ class CasBulkAddCasUsersTest extends CasBrowserTestBase {
     $this->assertSession()->responseContains('The following accounts were not registered because existing accounts are already using the usernames: <em class="placeholder">test1</em>');
 
     // But the other accounts should register just fine.
-    $this->assertSession()->responseContains('Successfully created accounts for the following usernames: <em class="placeholder"><a href="/user/' . $user_test3->id() . '" hreflang="en">test 3</a>, <a href="/user/' . $user_test4->id() . '" hreflang="en">test4</a></em>');
+    $this->assertSession()->responseContains('Successfully created accounts for the following usernames: <em class="placeholder"><a href="' . base_path() . 'user/' . $user_test3->id() . '" hreflang="en">test 3</a>, <a href="' . base_path() . 'user/' . $user_test4->id() . '" hreflang="en">test4</a></em>');
   }
 
 }
