@@ -311,7 +311,7 @@ class CasUserManager {
    *   The user account entity.
    */
   public function removeCasUsernameForAccount(UserInterface $account) {
-    $this->authmap->delete($account->id());
+    $this->authmap->delete($account->id(), $this->provider);
   }
 
   /**
