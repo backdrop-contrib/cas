@@ -5,6 +5,8 @@
  * Provides CAS authentication for Drupal.
  */
 
+use Drupal\cas\CasRedirectData;
+use Drupal\cas\Service\CasHelper;
 use Drupal\user\RoleInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;

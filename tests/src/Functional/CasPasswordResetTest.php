@@ -52,12 +52,10 @@ class CasPasswordResetTest extends CasBrowserTestBase {
 
     // Check that a CAS user is able to reset their password.
     $this->drupalPostForm('/user/password', ['name' => 'user_with_cas'], 'Submit');
-    $this->assertSession()->addressEquals('user/login');
     $this->assertSession()->pageTextContains('Further instructions have been sent to your email address.');
 
     // Check that a non-CAS user is able to reset their password.
     $this->drupalPostForm('/user/password', ['name' => 'user_without_cas'], 'Submit');
-    $this->assertSession()->addressEquals('user/login');
     $this->assertSession()->pageTextContains('Further instructions have been sent to your email address.');
 
     // Test with the 'user_accounts.restrict_password_management' setting on.
@@ -77,7 +75,6 @@ class CasPasswordResetTest extends CasBrowserTestBase {
 
     // Check that a non-CAS user is able to reset their password.
     $this->drupalPostForm('/user/password', ['name' => 'user_without_cas'], 'Submit');
-    $this->assertSession()->addressEquals('user/login');
     $this->assertSession()->pageTextContains('Further instructions have been sent to your email address.');
   }
 

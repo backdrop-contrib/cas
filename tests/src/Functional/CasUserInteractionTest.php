@@ -18,7 +18,7 @@ class CasUserInteractionTest extends CasBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'block',
     'cas',
     'cas_mock_server',
