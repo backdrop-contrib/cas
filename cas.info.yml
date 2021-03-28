@@ -1,8 +1,7 @@
 name: CAS
 description: 'Provides CAS authentication for Drupal.'
 type: module
-core: 8.x
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^8.8 || ^9
 configure: cas.settings
 dependencies:
   - externalauth:externalauth (>= 1.2)
