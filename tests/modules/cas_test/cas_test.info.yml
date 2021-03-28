@@ -1,8 +1,6 @@
 name: 'CAS test'
 type: module
 description: 'Used by the automated tests for the CAS module.'
-core: 8.x
-core_version_requirement: ^8 || ^9
 package: Testing
 dependencies:
   - cas:cas
