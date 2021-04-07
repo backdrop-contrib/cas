@@ -156,7 +156,7 @@ class CasUserManagerTest extends UnitTestCase {
       ])
       ->getMock();
 
-    $this->assertNotEmpty($cas_user_manager->register('test', [], 'test'), 'Successfully registered user.');
+    $this->assertNotEmpty($cas_user_manager->register('test', 'test', []), 'Successfully registered user.');
   }
 
   /**

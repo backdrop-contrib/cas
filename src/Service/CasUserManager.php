@@ -19,7 +19,7 @@ use Drupal\cas\CasPropertyBag;
 use Drupal\Component\Utility\Crypt;
 
 /**
- * Class CasUserManager.
+ * Provides the 'cas.user_manager' service default implementation.
  */
 class CasUserManager {
 
@@ -136,10 +136,10 @@ class CasUserManager {
    *
    * @param string $authname
    *   The CAS username.
-   * @param array $property_values
-   *   Property values to assign to the user on registration.
    * @param string $local_username
    *   The local Drupal username to be created.
+   * @param array $property_values
+   *   (optional) Property values to assign to the user on registration.
    *
    * @return \Drupal\user\UserInterface
    *   The user entity of the newly registered user.
@@ -147,7 +147,7 @@ class CasUserManager {
    * @throws \Drupal\cas\Exception\CasLoginException
    *   When the user account could not be registered.
    */
-  public function register($authname, array $property_values = [], $local_username) {
+  public function register($authname, $local_username, array $property_values = []) {
     $property_values['name'] = $local_username;
     $property_values['pass'] = $this->randomPassword();
 
@@ -190,7 +190,7 @@ class CasUserManager {
         $this->casHelper->log(LogLevel::DEBUG, 'Dispatching EVENT_PRE_REGISTER.');
         $this->eventDispatcher->dispatch(CasHelper::EVENT_PRE_REGISTER, $cas_pre_register_event);
         if ($cas_pre_register_event->getAllowAutomaticRegistration()) {
-          $account = $this->register($property_bag->getUsername(), $cas_pre_register_event->getPropertyValues(), $cas_pre_register_event->getDrupalUsername());
+          $account = $this->register($property_bag->getUsername(), $cas_pre_register_event->getDrupalUsername(), $cas_pre_register_event->getPropertyValues());
         }
         else {
           throw new CasLoginException("Cannot register user, an event listener denied access.", CasLoginException::SUBSCRIBER_DENIED_REG);

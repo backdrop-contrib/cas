@@ -28,7 +28,7 @@ class CasUserInteractionTest extends CasBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     // Create a local user.
