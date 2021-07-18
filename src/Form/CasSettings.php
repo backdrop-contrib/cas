@@ -223,7 +223,7 @@ class CasSettings extends ConfigFormBase {
     $form['user_accounts']['email_assignment_strategy'] = [
       '#type' => 'radios',
       '#title' => $this->t('Email address assignment'),
-      '#description' => $this->t("Drupal requires every user have an email address. Select how you'd like to assign an email to automatically registered users."),
+      '#description' => $this->t("Drupal requires every user to have an email address. Select how you'd like to assign an email to automatically registered users."),
       '#default_value' => $config->get('user_accounts.email_assignment_strategy'),
       '#options' => [
         CasUserManager::EMAIL_ASSIGNMENT_STANDARD => $this->t('Use the CAS username combined with a custom domain name you specify.'),
