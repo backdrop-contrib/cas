@@ -53,7 +53,8 @@ class CasLoginException extends \Exception {
    * @return $this
    */
   public function setSubscriberCancelReason($reason) {
-    if ($this->getCode() === self::SUBSCRIBER_DENIED_LOGIN) {
+    $code = $this->getCode();
+    if ($code === self::SUBSCRIBER_DENIED_LOGIN || $code === self::SUBSCRIBER_DENIED_REG) {
       $this->subscriberCancelReason = $reason;
     }
     return $this;

@@ -193,7 +193,9 @@ class CasUserManager {
           $account = $this->register($property_bag->getUsername(), $cas_pre_register_event->getDrupalUsername(), $cas_pre_register_event->getPropertyValues());
         }
         else {
-          throw new CasLoginException("Cannot register user, an event listener denied access.", CasLoginException::SUBSCRIBER_DENIED_REG);
+          $reason = $cas_pre_register_event->getCancelRegistrationReason();
+          throw (new CasLoginException("Cannot register user, an event listener denied access.", CasLoginException::SUBSCRIBER_DENIED_REG))
+            ->setSubscriberCancelReason($reason);
         }
       }
       else {
@@ -220,7 +222,8 @@ class CasUserManager {
 
     if (!$pre_login_event->getAllowLogin()) {
       $reason = $pre_login_event->getCancelLoginReason();
-      throw (new CasLoginException('Cannot login, an event listener denied access.', CasLoginException::SUBSCRIBER_DENIED_LOGIN))->setSubscriberCancelReason($reason);
+      throw (new CasLoginException('Cannot login, an event listener denied access.', CasLoginException::SUBSCRIBER_DENIED_LOGIN))
+        ->setSubscriberCancelReason($reason);
     }
 
     $this->externalAuth->userLoginFinalize($account, $property_bag->getUsername(), $this->provider);

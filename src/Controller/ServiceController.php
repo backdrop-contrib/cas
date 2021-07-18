@@ -347,6 +347,12 @@ class ServiceController implements ContainerInjectionInterface {
         break;
 
       case CasLoginException::SUBSCRIBER_DENIED_REG:
+        // If a subscriber has denied the registration by setting a custom
+        // message, use that message and exit here.
+        $message = $e->getSubscriberCancelReason();
+        if ($message) {
+          return $message;
+        }
         $msgKey = 'message_subscriber_denied_reg';
         break;
 
