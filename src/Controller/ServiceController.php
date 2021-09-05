@@ -27,7 +27,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Messenger\MessengerInterface;
 
 /**
- * Class ServiceController.
+ * Controller used when redirect back from CAS authentication.
  */
 class ServiceController implements ContainerInjectionInterface {
 
@@ -242,7 +242,10 @@ class ServiceController implements ContainerInjectionInterface {
       $this->casHelper->log(
         LogLevel::DEBUG,
         'Username was changed from %original to %new from a subscriber.',
-        ['%original' => $cas_validation_info->getOriginalUsername(), '%new' => $cas_validation_info->getUsername()]
+        [
+          '%original' => $cas_validation_info->getOriginalUsername(),
+          '%new' => $cas_validation_info->getUsername(),
+        ]
       );
     }
 

@@ -109,7 +109,10 @@ class CasUserFormFieldTest extends CasBrowserTestBase {
    * Tests the "restrict password management" feature.
    */
   public function testRestrictedPasswordManagementWorks() {
-    $admin = $this->drupalCreateUser(['administer account settings', 'administer users']);
+    $admin = $this->drupalCreateUser([
+      'administer account settings',
+      'administer users',
+    ]);
     $non_cas_user = $this->drupalCreateUser();
     $cas_user = $this->drupalCreateUser();
 
@@ -213,7 +216,10 @@ class CasUserFormFieldTest extends CasBrowserTestBase {
    * Tests the restricted email management feature.
    */
   public function testRestrictedEmailManagementWorks() {
-    $admin = $this->drupalCreateUser(['administer account settings', 'administer users']);
+    $admin = $this->drupalCreateUser([
+      'administer account settings',
+      'administer users',
+    ]);
     $non_cas_user = $this->drupalCreateUser();
     $cas_user = $this->drupalCreateUser();
 

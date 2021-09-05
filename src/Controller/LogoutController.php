@@ -103,7 +103,7 @@ class LogoutController implements ContainerInjectionInterface {
    *   The fully constructed server logout URL.
    */
   public function getServerLogoutUrl(Request $request) {
-    // TODO: Allow cas server config to be altered.
+    // @todo Allow cas server config to be altered.
     $casServerConfig = CasServerConfig::createFromModuleConfig($this->settings);
     $base_url = $casServerConfig->getServerBaseUrl() . 'logout';
 

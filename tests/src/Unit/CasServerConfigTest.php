@@ -134,4 +134,5 @@ class CasServerConfigTest extends UnitTestCase {
       ],
     ];
   }
+
 }

@@ -115,7 +115,10 @@ class CasProxyHelperTest extends UnitTestCase {
          </cas:serviceResponse>";
       $mock = new MockHandler([
         new Response(200, [], $xml_response),
-        new Response(200, ['Content-type' => 'text/html', 'Set-Cookie' => 'SESSION=' . $cookie_value]),
+        new Response(200, [
+          'Content-type' => 'text/html',
+          'Set-Cookie' => 'SESSION=' . $cookie_value,
+        ]),
       ]);
       $handler = HandlerStack::create($mock);
       $httpClient = new Client(['handler' => $handler]);
@@ -211,7 +214,10 @@ class CasProxyHelperTest extends UnitTestCase {
       $secondResponse = new Response(404);
     }
     else {
-      $secondResponse = new Response(200, ['Content-type' => 'text/html', 'Set-Cookie' => 'SESSION=' . $cookie_value]);
+      $secondResponse = new Response(200, [
+        'Content-type' => 'text/html',
+        'Set-Cookie' => 'SESSION=' . $cookie_value,
+      ]);
     }
     $mock = new MockHandler(
       [new Response($code, [], $response), $secondResponse]

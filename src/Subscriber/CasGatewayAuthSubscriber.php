@@ -215,7 +215,10 @@ class CasGatewayAuthSubscriber implements EventSubscriberInterface {
     // so that when the ServiceController eventually processess the login,
     // it knows to return the user back here.
     $currentPath = str_replace($event->getRequest()->getSchemeAndHttpHost(), '', $event->getRequest()->getUri());
-    $redirectData = new CasRedirectData(['destination' => $currentPath, 'from_gateway' => TRUE], ['gateway' => 'true']);
+    $redirectData = new CasRedirectData([
+      'destination' => $currentPath,
+      'from_gateway' => TRUE,
+    ], ['gateway' => 'true']);
     $this->casHelper->log(LogLevel::DEBUG, 'Initializing gateway auth from CasSubscriber.');
 
     $response = $this->casRedirector->buildRedirectResponse($redirectData);
@@ -331,7 +334,10 @@ class CasGatewayAuthSubscriber implements EventSubscriberInterface {
     // it knows to return the user back here.
     $request = $event->getRequest();
     $currentPath = str_replace($request->getSchemeAndHttpHost(), '', $request->getUri());
-    $redirectData = new CasRedirectData(['destination' => $currentPath, 'from_gateway' => TRUE], ['gateway' => 'true']);
+    $redirectData = new CasRedirectData([
+      'destination' => $currentPath,
+      'from_gateway' => TRUE,
+    ], ['gateway' => 'true']);
 
     $redirectResponse = $this->casRedirector->buildRedirectResponse($redirectData);
     if ($redirectResponse) {

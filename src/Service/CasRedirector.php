@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 
 /**
- * Class CasRedirector.
+ * Helper class that builds the redirect response.
  */
 class CasRedirector {
 

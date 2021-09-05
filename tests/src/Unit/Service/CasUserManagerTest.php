@@ -259,7 +259,7 @@ class CasUserManagerTest extends UnitTestCase {
   }
 
   /**
-   * User account doesn't exist, auto reg is enabled, and listener allow registration.
+   * Account doesn't exist, autoreg is on, and listener allows registration.
    *
    * @covers ::login
    */

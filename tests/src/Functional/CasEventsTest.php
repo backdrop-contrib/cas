@@ -6,7 +6,7 @@ use Drupal\cas\CasPropertyBag;
 use Drupal\Tests\cas\Traits\CasTestTrait;
 
 /**
- * Class CasEventsTest.
+ * Tests CAS events.
  *
  * @group cas
  */

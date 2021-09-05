@@ -68,8 +68,7 @@ class CasGatewayAuthSubscriberTest extends CasBrowserTestBase {
     $this->prepareRequest();
     $session->visit($this->buildUrl('node/1', ['absolute' => TRUE]));
     $this->assertEquals(302, $session->getStatusCode());
-    $expected_redirect_url = 'https://fakecasserver.localhost/auth/login?' . UrlHelper::buildQuery(['gateway' => 'true', 'service' => $this->buildServiceUrlWithParams(['destination' => $base_path . 'node/1', 'from_gateway' => 1])]);
-    $this->assertEquals($expected_redirect_url, $session->getResponseHeader('Location'));
+    $this->assertEquals($this->getExpectedRedirectUrl(1), $session->getResponseHeader('Location'));
     // A cookie should have been set indicating we've checked for gateway.
     $this->assertNotEmpty($this->getSession()->getCookie('cas_gateway_checked_ss'));
     // Visiting another page that has gateway enabled should NOT redirect there
@@ -86,14 +85,12 @@ class CasGatewayAuthSubscriberTest extends CasBrowserTestBase {
     $session->reset();
     $session->visit($this->buildUrl('node/1', ['absolute' => TRUE]));
     $this->assertEquals(302, $session->getStatusCode());
-    $expected_redirect_url = 'https://fakecasserver.localhost/auth/login?' . UrlHelper::buildQuery(['gateway' => 'true', 'service' => $this->buildServiceUrlWithParams(['destination' => $base_path . 'node/1', 'from_gateway' => 1])]);
-    $this->assertEquals($expected_redirect_url, $session->getResponseHeader('Location'));
+    $this->assertEquals($this->getExpectedRedirectUrl(1), $session->getResponseHeader('Location'));
     $this->assertNotEmpty($this->getSession()->getCookie('cas_gateway_checked_ss'));
     $session->reset();
     $session->visit($this->buildUrl('node/2', ['absolute' => TRUE]));
     $this->assertEquals(302, $session->getStatusCode());
-    $expected_redirect_url = 'https://fakecasserver.localhost/auth/login?' . UrlHelper::buildQuery(['gateway' => 'true', 'service' => $this->buildServiceUrlWithParams(['destination' => $base_path . 'node/2', 'from_gateway' => 1])]);
-    $this->assertEquals($expected_redirect_url, $session->getResponseHeader('Location'));
+    $this->assertEquals($this->getExpectedRedirectUrl(2), $session->getResponseHeader('Location'));
 
     // Now configure it so that it checks EVERY Request and confirm that it
     // works, even without resetting cookies.
@@ -109,8 +106,7 @@ class CasGatewayAuthSubscriberTest extends CasBrowserTestBase {
 
     $session->visit($this->buildUrl('node/1', ['absolute' => TRUE]));
     $this->assertEquals(302, $session->getStatusCode());
-    $expected_redirect_url = 'https://fakecasserver.localhost/auth/login?' . UrlHelper::buildQuery(['gateway' => 'true', 'service' => $this->buildServiceUrlWithParams(['destination' => $base_path . 'node/1', 'from_gateway' => 1])]);
-    $this->assertEquals($expected_redirect_url, $session->getResponseHeader('Location'));
+    $this->assertEquals($this->getExpectedRedirectUrl(1), $session->getResponseHeader('Location'));
     $this->assertEmpty($this->getSession()->getCookie('cas_gateway_checked_ss'));
 
     // Revisit same page again first to flush the session var that gateway
@@ -118,8 +114,7 @@ class CasGatewayAuthSubscriberTest extends CasBrowserTestBase {
     $session->visit($this->buildUrl('node/1', ['absolute' => TRUE]));
     $session->visit($this->buildUrl('node/2', ['absolute' => TRUE]));
     $this->assertEquals(302, $session->getStatusCode());
-    $expected_redirect_url = 'https://fakecasserver.localhost/auth/login?' . UrlHelper::buildQuery(['gateway' => 'true', 'service' => $this->buildServiceUrlWithParams(['destination' => $base_path . 'node/2', 'from_gateway' => 1])]);
-    $this->assertEquals($expected_redirect_url, $session->getResponseHeader('Location'));
+    $this->assertEquals($this->getExpectedRedirectUrl(2), $session->getResponseHeader('Location'));
     $this->assertEmpty($this->getSession()->getCookie('cas_gateway_checked_ss'));
 
     // Restrict the redirects to only the first node and not the second node,
@@ -165,7 +160,7 @@ class CasGatewayAuthSubscriberTest extends CasBrowserTestBase {
 
     // Enable client side redirect and confirm that the user is not redirected
     // to CAS via serverside, but the page contains the JS library to redirect.
-    // @TODO test with a JS driver as well so we know the JS code works?
+    // @todo test with a JS driver as well so we know the JS code works?
     $edit = [
       'gateway[enabled]' => TRUE,
       'gateway[recheck_time]' => 720,
@@ -179,9 +174,8 @@ class CasGatewayAuthSubscriberTest extends CasBrowserTestBase {
     $this->assertEquals(200, $session->getStatusCode());
 
     // Drupal settings should be populated with the redirect URL.
-    $expected_redirect_url = 'https://fakecasserver.localhost/auth/login?' . UrlHelper::buildQuery(['gateway' => 'true', 'service' => $this->buildServiceUrlWithParams(['destination' => $base_path . 'node/1', 'from_gateway' => 1])]);
     $drupalSettings = $this->getDrupalSettings();
-    $this->assertEquals($expected_redirect_url, $drupalSettings['cas']['gatewayRedirectUrl']);
+    $this->assertEquals($this->getExpectedRedirectUrl(1), $drupalSettings['cas']['gatewayRedirectUrl']);
     $this->assertEquals(720, $drupalSettings['cas']['recheckTime']);
 
     // The JS data should not be added on paths that aren't configured to have
@@ -190,9 +184,28 @@ class CasGatewayAuthSubscriberTest extends CasBrowserTestBase {
     $this->assertEquals(200, $session->getStatusCode());
     $this->assertEmpty($this->getDrupalSettings());
 
-    // @TODO Test that visting page as a bot does NOT trigger a redirect.
+    // @todo Test that visting page as a bot does NOT trigger a redirect.
     // We cannot do this at the moment because we can't spoof a user agent!
     // See https://www.drupal.org/node/2820515.
+  }
+
+  /**
+   * Returns the expected redirect URL.
+   *
+   * @param int $nid
+   *   The node ID.
+   *
+   * @return string
+   *   The expected redirect URL.
+   */
+  protected function getExpectedRedirectUrl(int $nid): string {
+    return 'https://fakecasserver.localhost/auth/login?' . UrlHelper::buildQuery([
+      'gateway' => 'true',
+      'service' => $this->buildServiceUrlWithParams([
+        'destination' => "{$GLOBALS['base_path']}node/{$nid}",
+        'from_gateway' => 1,
+      ]),
+    ]);
   }
 
 }

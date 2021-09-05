@@ -14,9 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\cas\Service\CasHelper;
 
 /**
- * Class CasSettings.
- *
- * @codeCoverageIgnore
+ * Provides the CAS settings form.
  */
 class CasSettings extends ConfigFormBase {
 
@@ -216,7 +214,10 @@ class CasSettings extends ConfigFormBase {
     if (!$this->moduleHandler->moduleExists('cas_attributes')) {
       $form['user_accounts']['cas_attributes_callout'] = [
         '#prefix' => '<p class="messages messages--status">',
-        '#markup' => $this->t('If your CAS server supports <a href="@attributes" target="_blank">attributes</a>, you can install the <a href="@module" target="_blank">CAS Attributes</a> module to map them to user fields and roles during login and auto-registration.', ['@attributes' => 'https://apereo.github.io/cas/5.1.x/protocol/CAS-Protocol-Specification.html#255-attributes-cas-30', '@module' => 'https://drupal.org/project/cas_attributes']),
+        '#markup' => $this->t('If your CAS server supports <a href="@attributes" target="_blank">attributes</a>, you can install the <a href="@module" target="_blank">CAS Attributes</a> module to map them to user fields and roles during login and auto-registration.', [
+          '@attributes' => 'https://apereo.github.io/cas/5.1.x/protocol/CAS-Protocol-Specification.html#255-attributes-cas-30',
+          '@module' => 'https://drupal.org/project/cas_attributes',
+        ]),
         '#suffix' => '</p>',
       ];
     }
@@ -572,11 +573,20 @@ class CasSettings extends ConfigFormBase {
     }
 
     if ($form_state->getValue(['user_accounts', 'auto_register'])) {
-      $email_assignment_strategy = $form_state->getValue(['user_accounts', 'email_assignment_strategy']);
-      if ($email_assignment_strategy == CasUserManager::EMAIL_ASSIGNMENT_STANDARD && empty($form_state->getValue(['user_accounts', 'email_hostname']))) {
+      $email_assignment_strategy = $form_state->getValue([
+        'user_accounts',
+        'email_assignment_strategy',
+      ]);
+      if ($email_assignment_strategy == CasUserManager::EMAIL_ASSIGNMENT_STANDARD && empty($form_state->getValue([
+        'user_accounts',
+        'email_hostname',
+      ]))) {
         $form_state->setErrorByName('user_accounts][email_hostname', $this->t('You must provide a hostname for the auto assigned email address.'));
       }
-      elseif ($email_assignment_strategy == CasUserManager::EMAIL_ASSIGNMENT_ATTRIBUTE && empty($form_state->getValue(['user_accounts', 'email_attribute']))) {
+      elseif ($email_assignment_strategy == CasUserManager::EMAIL_ASSIGNMENT_ATTRIBUTE && empty($form_state->getValue([
+        'user_accounts',
+        'email_attribute',
+      ]))) {
         $form_state->setErrorByName('user_accounts][email_attribute', $this->t('You must provide an attribute name for the auto assigned email address.'));
       }
 
@@ -585,7 +595,10 @@ class CasSettings extends ConfigFormBase {
       }
     }
 
-    $error_page_val = $form_state->getValue(['error_handling', 'login_failure_page']);
+    $error_page_val = $form_state->getValue([
+      'error_handling',
+      'login_failure_page',
+    ]);
     if ($error_page_val) {
       $error_page_val = trim($error_page_val);
       if (strpos($error_page_val, '/') !== 0) {
@@ -629,7 +642,10 @@ class CasSettings extends ConfigFormBase {
     $this->gatewayPaths->submitConfigurationForm($form, $condition_values);
     $config
       ->set('gateway.enabled', $form_state->getValue(['gateway', 'enabled']))
-      ->set('gateway.recheck_time', $form_state->getValue(['gateway', 'recheck_time']))
+      ->set('gateway.recheck_time', $form_state->getValue([
+        'gateway',
+        'recheck_time',
+      ]))
       ->set('gateway.paths', $this->gatewayPaths->getConfiguration())
       ->set('gateway.method', $form_state->getValue(['gateway', 'method']));
 
@@ -637,35 +653,83 @@ class CasSettings extends ConfigFormBase {
       ->setValues($form_state->getValue(['forced_login', 'paths']));
     $this->forcedLoginPaths->submitConfigurationForm($form, $condition_values);
     $config
-      ->set('forced_login.enabled', $form_state->getValue(['forced_login', 'enabled']))
+      ->set('forced_login.enabled', $form_state->getValue([
+        'forced_login',
+        'enabled',
+      ]))
       ->set('forced_login.paths', $this->forcedLoginPaths->getConfiguration());
 
     $config
-      ->set('logout.logout_destination', $form_state->getValue(['logout', 'logout_destination']))
-      ->set('logout.enable_single_logout', $form_state->getValue(['logout', 'enable_single_logout']))
+      ->set('logout.logout_destination', $form_state->getValue([
+        'logout',
+        'logout_destination',
+      ]))
+      ->set('logout.enable_single_logout', $form_state->getValue([
+        'logout',
+        'enable_single_logout',
+      ]))
       ->set('logout.cas_logout', $form_state->getValue(['logout', 'cas_logout']))
-      ->set('logout.single_logout_session_lifetime', $form_state->getValue(['logout', 'single_logout_session_lifetime']));
+      ->set('logout.single_logout_session_lifetime', $form_state->getValue([
+        'logout',
+        'single_logout_session_lifetime',
+      ]));
     $config
       ->set('proxy.initialize', $form_state->getValue(['proxy', 'initialize']))
-      ->set('proxy.can_be_proxied', $form_state->getValue(['proxy', 'can_be_proxied']))
-      ->set('proxy.proxy_chains', $form_state->getValue(['proxy', 'proxy_chains']));
+      ->set('proxy.can_be_proxied', $form_state->getValue([
+        'proxy',
+        'can_be_proxied',
+      ]))
+      ->set('proxy.proxy_chains', $form_state->getValue([
+        'proxy',
+        'proxy_chains',
+      ]));
     $config
-      ->set('user_accounts.prevent_normal_login', $form_state->getValue(['user_accounts', 'prevent_normal_login']))
-      ->set('user_accounts.auto_register', $form_state->getValue(['user_accounts', 'auto_register']))
-      ->set('user_accounts.email_assignment_strategy', $form_state->getValue(['user_accounts', 'email_assignment_strategy']))
-      ->set('user_accounts.email_hostname', $form_state->getValue(['user_accounts', 'email_hostname']))
-      ->set('user_accounts.email_attribute', $form_state->getValue(['user_accounts', 'email_attribute']))
-      ->set('user_accounts.restrict_password_management', $form_state->getValue(['user_accounts', 'restrict_password_management']))
-      ->set('user_accounts.restrict_email_management', $form_state->getValue(['user_accounts', 'restrict_email_management']));
+      ->set('user_accounts.prevent_normal_login', $form_state->getValue([
+        'user_accounts',
+        'prevent_normal_login',
+      ]))
+      ->set('user_accounts.auto_register', $form_state->getValue([
+        'user_accounts',
+        'auto_register',
+      ]))
+      ->set('user_accounts.email_assignment_strategy', $form_state->getValue([
+        'user_accounts',
+        'email_assignment_strategy',
+      ]))
+      ->set('user_accounts.email_hostname', $form_state->getValue([
+        'user_accounts',
+        'email_hostname',
+      ]))
+      ->set('user_accounts.email_attribute', $form_state->getValue([
+        'user_accounts',
+        'email_attribute',
+      ]))
+      ->set('user_accounts.restrict_password_management', $form_state->getValue([
+        'user_accounts',
+        'restrict_password_management',
+      ]))
+      ->set('user_accounts.restrict_email_management', $form_state->getValue([
+        'user_accounts',
+        'restrict_email_management',
+      ]));
 
     $auto_assigned_roles = [];
-    if ($form_state->getValue(['user_accounts', 'auto_assigned_roles_enable'])) {
-      $auto_assigned_roles = array_keys($form_state->getValue(['user_accounts', 'auto_assigned_roles']));
+    if ($form_state->getValue([
+      'user_accounts',
+      'auto_assigned_roles_enable',
+    ])) {
+      $auto_assigned_roles = array_keys($form_state->getValue([
+        'user_accounts',
+        'auto_assigned_roles',
+      ]));
     }
     $config
       ->set('user_accounts.auto_assigned_roles', $auto_assigned_roles);
 
-    $config->set('error_handling.login_failure_page', trim($form_state->getValue(['error_handling', 'login_failure_page'])));
+    $config->set('error_handling.login_failure_page', trim($form_state->getValue([
+      'error_handling',
+      'login_failure_page',
+    ])));
     $messages = $form_state->getValue(['error_handling', 'messages']);
     $config
       ->set('error_handling.message_validation_failure', trim($messages['message_validation_failure']))
@@ -678,8 +742,14 @@ class CasSettings extends ConfigFormBase {
       ->set('error_handling.message_restrict_password_management', trim($messages['message_restrict_password_management']));
 
     $config
-      ->set('advanced.debug_log', $form_state->getValue(['advanced', 'debug_log']))
-      ->set('advanced.connection_timeout', $form_state->getValue(['advanced', 'connection_timeout']));
+      ->set('advanced.debug_log', $form_state->getValue([
+        'advanced',
+        'debug_log',
+      ]))
+      ->set('advanced.connection_timeout', $form_state->getValue([
+        'advanced',
+        'connection_timeout',
+      ]));
 
     $config->save();
     parent::submitForm($form, $form_state);

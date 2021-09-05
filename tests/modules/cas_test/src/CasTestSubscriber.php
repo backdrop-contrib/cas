@@ -8,7 +8,7 @@ use Drupal\cas\Service\CasHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class CasTestSubscriber.
+ * Subscribes to pre-login and pre-register events.
  */
 class CasTestSubscriber implements EventSubscriberInterface {
 
@@ -46,6 +46,7 @@ class CasTestSubscriber implements EventSubscriberInterface {
    * Cancels the login.
    *
    * @param \Drupal\cas\Event\CasPreLoginEvent $event
+   *   The event.
    */
   public function onPreLogin(CasPreLoginEvent $event) {
     $flag = \Drupal::state()->get('cas_test.flag');

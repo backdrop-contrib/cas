@@ -11,7 +11,7 @@ use Psr\Log\LogLevel;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class CasHelper.
+ * Utility and helper methods.
  */
 class CasHelper {
 

@@ -111,14 +111,14 @@ class CasPreRegisterEvent extends Event {
    * @param bool $allow_automatic_registration
    *   TRUE to allow auto registration, FALSE to deny it.
    *
-   * @deprecated in cas:2.0.0 and is removed from cas:3.0.0. Instead, use 
-   *   \Drupal\cas\Event\CasPreRegisterEvent::allowAutomaticRegistration() or 
+   * @deprecated in cas:2.0.0 and is removed from cas:3.0.0. Instead, use
+   *   \Drupal\cas\Event\CasPreRegisterEvent::allowAutomaticRegistration() or
    *   \Drupal\cas\Event\CasPreRegisterEvent::cancelAutomaticRegistration().
    *
    * @see https://www.drupal.org/project/cas/issues/3221111
    */
   public function setAllowAutomaticRegistration($allow_automatic_registration) {
-    @trigger_error(__METHOD__ . '() is deprecated in cas:2.0.0 and is removed from cas:3.0.0. Instead, use \Drupal\cas\Event\CasPreRegisterEvent::allowAutomaticRegistration() or \Drupal\cas\Event\CasPreRegisterEvent::cancelAutomaticRegistration().', E_USER_DEPRECATED);
+    @trigger_error('CasPreRegisterEvent::setAllowAutomaticRegistration() is deprecated in cas:2.0.0 and is removed from cas:3.0.0. Instead, use \Drupal\cas\Event\CasPreRegisterEvent::allowAutomaticRegistration() or \Drupal\cas\Event\CasPreRegisterEvent::cancelAutomaticRegistration(). See https://www.drupal.org/project/cas/issues/3221111', E_USER_DEPRECATED);
     if ($allow_automatic_registration) {
       $this->allowAutomaticRegistration();
     }
