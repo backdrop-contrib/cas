@@ -182,10 +182,10 @@ class CasValidatorTest extends UnitTestCase {
     $response = "yes\n$username\n";
     $testCases[] = [
       'ST-123456',
-      ['returnto' => 'node/1'],
+      ['destination' => 'node/1'],
       $username,
       $response,
-      'https://example-server.com/cas/validate?service=https%3A//example.com/client%3Freturnto%3Dnode%252F1&ticket=ST-123456',
+      'https://example-server.com/cas/validate?service=https%3A//example.com/client%3Fdestination%3Dnode%252F1&ticket=ST-123456',
       '1.0',
       CasHelper::CA_CUSTOM,
       FALSE,

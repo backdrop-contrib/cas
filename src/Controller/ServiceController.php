@@ -114,8 +114,9 @@ class ServiceController implements ContainerInjectionInterface {
    *   The CAS User Manager service.
    * @param \Drupal\cas\Service\CasLogout $cas_logout
    *   The CAS Logout service.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
+   * @param \Symfony\Component\HttpFoundation\RequestStack|null $request_stack
+   *   (deprecated) The request stack. The $request_stack parameter is
+   *   deprecated in cas:2.0.0 and is removed from cas:3.0.0.
    * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
    *   The URL generator.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -127,12 +128,19 @@ class ServiceController implements ContainerInjectionInterface {
    * @param \Drupal\externalauth\ExternalAuthInterface $external_auth
    *   The external auth service.
    */
-  public function __construct(CasHelper $cas_helper, CasValidator $cas_validator, CasUserManager $cas_user_manager, CasLogout $cas_logout, RequestStack $request_stack, UrlGeneratorInterface $url_generator, ConfigFactoryInterface $config_factory, MessengerInterface $messenger, EventDispatcherInterface $event_dispatcher, ExternalAuthInterface $external_auth) {
+  public function __construct(CasHelper $cas_helper, CasValidator $cas_validator, CasUserManager $cas_user_manager, CasLogout $cas_logout, $request_stack, UrlGeneratorInterface $url_generator, ConfigFactoryInterface $config_factory, MessengerInterface $messenger, EventDispatcherInterface $event_dispatcher, ExternalAuthInterface $external_auth) {
     $this->casHelper = $cas_helper;
     $this->casValidator = $cas_validator;
     $this->casUserManager = $cas_user_manager;
     $this->casLogout = $cas_logout;
-    $this->requestStack = $request_stack;
+    // Support PHP 7.0.8. We should have been strict typed $request_stack as
+    // nullable request stack (?RequestStack), as we deprecate it, but nullables
+    // were introduced, later, in PHP 7.1.
+    assert($request_stack === NULL || $request_stack instanceof RequestStack);
+    if ($request_stack) {
+      @trigger_error('The request stack parameter is deprecated in cas:2.0.0 and is removed from cas:3.0.0. See https://www.drupal.org/node/3231208', E_USER_DEPRECATED);
+      $this->requestStack = $request_stack;
+    }
     $this->urlGenerator = $url_generator;
     $this->settings = $config_factory->get('cas.settings');
     $this->messenger = $messenger;
@@ -149,7 +157,7 @@ class ServiceController implements ContainerInjectionInterface {
       $container->get('cas.validator'),
       $container->get('cas.user_manager'),
       $container->get('cas.logout'),
-      $container->get('request_stack'),
+      NULL,
       $container->get('url_generator'),
       $container->get('config.factory'),
       $container->get('messenger'),
@@ -166,10 +174,11 @@ class ServiceController implements ContainerInjectionInterface {
    * back to the Drupal site using this controller action. That's why there's
    * so much going on in here - it needs to process a few different types of
    * requests.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The current HTTP request.
    */
-  public function handle() {
-    $request = $this->requestStack->getCurrentRequest();
-
+  public function handle(Request $request) {
     // First, check if this is a single-log-out (SLO) request from the server.
     if ($request->request->has('logoutRequest')) {
       try {
@@ -325,8 +334,8 @@ class ServiceController implements ContainerInjectionInterface {
       return RedirectResponse::create(Url::fromUserInput($this->settings->get('error_handling.login_failure_page'))->toString());
     }
     // Otherwise, send them to the homepage, or to the previous page they were
-    // on when login was initiated (which will be represented by the 'returnto'
-    // parameter).
+    // on when login was initiated (which is handled automatically via the
+    // "destination" parameter.
     else {
       $this->casHelper->handleReturnToParameter($request);
       return RedirectResponse::create($this->urlGenerator->generate('<front>'));

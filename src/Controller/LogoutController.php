@@ -82,14 +82,13 @@ class LogoutController implements ContainerInjectionInterface {
     // First log the user out of Drupal.
     user_logout();
 
+    // Redirect the user to the CAS server for logging out there as well.
     $cas_server_logout_url = $this->getServerLogoutUrl($this->requestStack->getCurrentRequest());
     $this->casHelper->log(
       LogLevel::DEBUG,
       "Drupal session terminated; redirecting to CAS server logout at %url",
       ['%url' => $cas_server_logout_url]
     );
-
-    // Redirect the user to the CAS server for logging out there as well.
     return new CasRedirectResponse($cas_server_logout_url, 302);
   }
 

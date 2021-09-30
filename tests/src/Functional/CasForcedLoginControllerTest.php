@@ -40,7 +40,7 @@ class CasForcedLoginControllerTest extends CasBrowserTestBase {
     // URL as well, so test each of these cases individually.
     $params_to_test = [
       [],
-      ['returnto' => 'node/1'],
+      ['destination' => 'node/1'],
       ['foo' => 'bar', 'buzz' => 'baz'],
     ];
     foreach ($params_to_test as $params) {
