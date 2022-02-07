@@ -1,0 +1,29 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the cas_test module.
+ *
+ */
+
+
+/**
+ * Migrate cas_test variables to config.
+ */
+function cas_test_update_1000() {
+  $config = config('cas_test.settings');
+  $config->set('cas_test_cas_user', update_variable_get('cas_test_cas_user', ''));
+  $config->set('cas_test_tickets', update_variable_get('cas_test_tickets', array()));
+  $config->set('cas_test_sso', update_variable_get('cas_test_sso', array()));
+  $config->save();
+
+  update_variable_del('cas_test_cas_user');
+  update_variable_del('cas_test_tickets');
+  update_variable_del('cas_test_sso');
+}
+
+/**
+ * Implements hook_install().
+ */
+function cas_test_install() {
+  // Dynamically generated variable data was detected.
+}

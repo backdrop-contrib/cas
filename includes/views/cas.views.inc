@@ -5,6 +5,10 @@
  *   Expose CAS user name to views.
  */
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function cas_views_data() {
   // cas_user table
 

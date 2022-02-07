@@ -29,6 +29,10 @@ function cas_add_user_form() {
   return $form;
 }
 
+/**
+ * @todo Please document this function.
+ * @see http://drupal.org/node/1354
+ */
 function cas_add_user_form_submit($form, &$form_state) {
   $cas_names = preg_split('/[\n\r|\r|\n]+/', $form_state['values']['cas_name']);
 
@@ -41,7 +45,7 @@ function cas_add_user_form_submit($form, &$form_state) {
     'operations' => $operations,
     'finished' => 'cas_batch_user_finished',
     'progress_message' => t('Processed @current out of @total.'),
-    'file' => drupal_get_path('module', 'cas') . '/cas.batch.inc',
+    'file' => backdrop_get_path('module', 'cas') . '/cas.batch.inc',
   );
 
   batch_set($batch);

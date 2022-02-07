@@ -1,5 +1,5 @@
 (function ($) {
-Drupal.behaviors.cas = {
+Backdrop.behaviors.cas = {
   attach: function (context) {
     var loginElements = $('.form-item-name, .form-item-pass, li.cas-link, ul.openid-links');
     var casElements = $('#edit-cas-login-redirection-message, li.user-link, li.uncas-link');

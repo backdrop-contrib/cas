@@ -34,10 +34,6 @@ function cas_drush_command() {
       'drush cas-user-create newcasuser' => 'Create a new user with CAS username newcasuser',
     ),
   );
-  $items['cas-phpcas-version'] = array(
-    'callback' => 'cas_drush_phpcas_version',
-    'description' => dt('Displays version of the installed phpCAS library.'),
-  );
   return $items;
 }
 
@@ -50,8 +46,6 @@ function cas_drush_help($section) {
       return dt('Create a CAS user account with the specified CAS username.');
     case 'drush:cas-user-add-role':
       return dt('Add a role to the specified CAS usernames.');
-    case 'drush:cas-phpcas-version':
-      return dt('Displays version of installed phpCAS library.');
   }
 }
 
@@ -87,15 +81,11 @@ function cas_drush_user_create($cas_name) {
  */
 function cas_drush_user_add_role($role, $users = '') {
   $uids = cas_drush_user_get_users_from_arguments($users);
-  if (drush_drupal_major_version() >= 7) {
-    $rid_query = db_query("SELECT rid FROM {role} WHERE name = :role", array(':role' => $role));
-  }
-  else {
-    $rid_query = db_query("SELECT rid FROM {role} WHERE name = '%s'", $role);
-  }
+  $user_role = user_role_load($role);
+
   if (!empty($uids)) {
-    if ($rid = drush_db_result($rid_query)) {
-      drush_op('user_multiple_role_edit', $uids, 'add_role', $rid);
+    if ($user_role) {
+      drush_op('user_multiple_role_edit', $uids, 'add_role', $role);
       foreach ($uids as $uid) {
         drush_log(dt("Added the !role role to uid !uid", array('!role' => $role, '!uid' => $uid)), 'success');
       }
@@ -106,18 +96,6 @@ function cas_drush_user_add_role($role, $users = '') {
   }
   else {
     return drush_set_error("Could not find any valid uids!");
-  }
-}
-
-/**
- * Displays version of the installed phpCAS library.
- */
-function cas_drush_phpcas_version() {
-  if ($version = @cas_phpcas_load()) {
-    drush_log(dt('phpCAS version: @version', array('@version' => $version)), 'ok');
-  }
-  else {
-    drush_set_error(dt('phpCAS could not be loaded. Please download phpCAS and configure its location.'));
   }
 }
 

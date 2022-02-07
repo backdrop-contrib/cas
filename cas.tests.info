@@ -1,0 +1,54 @@
+[CasTestHelper]
+name = CasTestHelper
+description = CasTestHelper
+group = cas
+file = cas.test
+
+[CasUserAdminTestCase]
+name = User administration
+description = Test CAS user administration.
+group = Central Authentication Service
+file = cas.test
+
+[CasUserTestCase]
+name = User behavior
+description = Test CAS user behavior, including auto-registration and user editing.
+group = Central Authentication Service
+file = cas.test
+
+[CasLogoutRedirectionTestCase]
+name = Logout redirection
+description = Test CAS user logout redirection.
+group = Central Authentication Service
+file = cas.test
+
+[CasLoginRedirectionTestCase]
+name = Login redirection
+description = Test CAS user login redirection.
+group = Central Authentication Service
+file = cas.test
+
+[CasSingleSignOutTestCase]
+name = Single Sign-Out
+description = Test CAS Single Sign-Out.
+group = Central Authentication Service
+file = cas.test
+
+[CasGatewayTestCase]
+name = CAS Gateway
+description = Test CAS Gateway ("Check to see if user is already logged in") feature.
+group = Central Authentication Service
+file = cas.test
+
+[CasRequiredLoginTestCase]
+name = Required Login
+description = Test CAS required login redirection.
+group = Central Authentication Service
+file = cas.test
+
+[CasLoginBlockTestCase]
+name = CAS login block
+description = Tests the CAS login block.
+group = Central Authentication Service
+file = cas.test
+

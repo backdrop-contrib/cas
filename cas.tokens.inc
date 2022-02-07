@@ -49,7 +49,7 @@ function cas_tokens($type, $tokens, array $data = array(), array $options = arra
     foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'name':
-          $replacements[$original] = $sanitize ? check_plain($cas) : $cas;
+          $replacements[$original] = $sanitize?check_plain($cas) : $cas;
           break;
       }
     }
@@ -62,7 +62,7 @@ function cas_tokens($type, $tokens, array $data = array(), array $options = arra
         case 'cas':
           // Provide [user:cas] token.
           if (!empty($account->cas_name)) {
-            $replacements[$original] = $sanitize ? check_plain($account->cas_name) : $account->cas_name;
+            $replacements[$original] = $sanitize?check_plain($account->cas_name) : $account->cas_name;
           }
           break;
       }

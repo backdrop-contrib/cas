@@ -82,50 +82,50 @@ function cas_schema() {
  */
 function cas_uninstall() {
   // Delete variables.
-  variable_del('cas_access');
-  variable_del('cas_allow_rememberme');
-  variable_del('cas_authmap');
-  variable_del('cas_auto_assigned_role');
-  variable_del('cas_cert');
-  variable_del('cas_changePasswordURL');
-  variable_del('cas_check_frequency');
-  variable_del('cas_debugfile');
-  variable_del('cas_domain');
-  variable_del('cas_exclude');
-  variable_del('cas_first_login_destination');
-  variable_del('cas_hide_email');
-  variable_del('cas_hide_password');
-  variable_del('cas_library_dir');
-  variable_del('cas_login_drupal_invite');
-  variable_del('cas_login_form');
-  variable_del('cas_login_invite');
-  variable_del('cas_login_message');
-  variable_del('cas_login_redir_message');
-  variable_del('cas_logout_destination');
-  variable_del('cas_pages');
-  variable_del('cas_pgtformat');
-  variable_del('cas_pgtpath');
-  variable_del('cas_port');
-  variable_del('cas_proxy');
-  variable_del('cas_proxy_list');
-  variable_del('cas_registerURL');
-  variable_del('cas_server');
-  variable_del('cas_uri');
-  variable_del('cas_user_register');
-  variable_del('cas_version');
-  variable_del('cas_single_logout_session_lifetime');
+  config_clear('cas.settings', 'cas_access');
+  config_clear('cas.settings', 'cas_allow_rememberme');
+  config_clear('cas.settings', 'cas_authmap');
+  config_clear('cas.settings', 'cas_auto_assigned_role');
+  config_clear('cas.settings', 'cas_cert');
+  config_clear('cas.settings', 'cas_changePasswordURL');
+  config_clear('cas.settings', 'cas_check_frequency');
+  config_clear('cas.settings', 'cas_debugfile');
+  config_clear('cas.settings', 'cas_domain');
+  config_clear('cas.settings', 'cas_exclude');
+  config_clear('cas.settings', 'cas_first_login_destination');
+  config_clear('cas.settings', 'cas_hide_email');
+  config_clear('cas.settings', 'cas_hide_password');
+  config_clear('cas.settings', 'cas_library_info_dir');
+  config_clear('cas.settings', 'cas_login_backdrop_invite');
+  config_clear('cas.settings', 'cas_login_form');
+  config_clear('cas.settings', 'cas_login_invite');
+  config_clear('cas.settings', 'cas_login_message');
+  config_clear('cas.settings', 'cas_login_redir_message');
+  config_clear('cas.settings', 'cas_logout_destination');
+  config_clear('cas.settings', 'cas_pages');
+  config_clear('cas.settings', 'cas_pgtformat');
+  config_clear('cas.settings', 'cas_pgtpath');
+  config_clear('cas.settings', 'cas_port');
+  config_clear('cas.settings', 'cas_proxy');
+  config_clear('cas.settings', 'cas_proxy_list');
+  config_clear('cas.settings', 'cas_registerURL');
+  config_clear('cas.settings', 'cas_server');
+  config_clear('cas.settings', 'cas_uri');
+  config_clear('cas.settings', 'cas_user_register');
+  config_clear('cas.settings', 'cas_version');
+  config_clear('cas.settings', 'cas_single_logout_session_lifetime');
 
   // And old (un-used) variables.
-  variable_del('cas_cert_verify');
-  variable_del('cas_check_first');
-  variable_del('cas_first_login');
-  variable_del('cas_hijack_user');
-  variable_del('cas_ldap_email_attribute');
-  variable_del('cas_logout_redirect');
-  variable_del('cas_signout');
-  variable_del('cas_useldap');
-  variable_del('cas_useldap_groups');
-  variable_del('cas_verify');
+  config_clear('cas.settings', 'cas_cert_verify');
+  config_clear('cas.settings', 'cas_check_first');
+  config_clear('cas.settings', 'cas_first_login');
+  config_clear('cas.settings', 'cas_hijack_user');
+  config_clear('cas.settings', 'cas_ldap_email_attribute');
+  config_clear('cas.settings', 'cas_logout_redirect');
+  config_clear('cas.settings', 'cas_signout');
+  config_clear('cas.settings', 'cas_useldap');
+  config_clear('cas.settings', 'cas_useldap_groups');
+  config_clear('cas.settings', 'cas_verify');
 }
 
 /**
@@ -136,8 +136,7 @@ function cas_requirements($phase) {
   $t = get_t();
 
   if ($phase == 'runtime') {
-    $phpcas_url = 'https://github.com/apereo/phpCAS/releases';
-    $phpcas_doc = 'https://apereo.github.io/cas/6.0.x/integration/CAS-Clients.html';
+    $phpcas_url = 'https://wiki.jasig.org/display/CASC/phpCAS';
 
     $requirements['phpcas']['title'] = $t('phpCAS');
     // Okay to call functions from cas.module since we are in the runtime
@@ -145,7 +144,7 @@ function cas_requirements($phase) {
     if ($version = @cas_phpcas_load()) {
       $requirements['phpcas']['value'] = $version;
       $requirements['phpcas']['severity'] = REQUIREMENT_INFO;
-      $requirements['phpcas']['description'] = $t('Please check periodically for <a href="@phpcas_url">security updates</a> and <a href="@phpcas_doc">updated documentation</a> to phpCAS.', array('@phpcas_url' => $phpcas_url, '@phpcas_doc' => $phpcas_doc));
+      $requirements['phpcas']['description'] = $t('Please check periodically for <a href="@phpcas_url">security updates</a> to phpCAS.', array('@phpcas_url' => $phpcas_url));
     }
     else {
       $requirements['phpcas']['value'] = $t('Not found');
@@ -153,7 +152,7 @@ function cas_requirements($phase) {
       $requirements['phpcas']['description'] = $t('phpCAS could not be loaded. Please <a href="@phpcas_url">download phpCAS</a> and <a href="@cas_url">configure its location</a>.', array('@phpcas_url' => $phpcas_url, '@cas_url' => url('admin/config/people/cas')));
     }
 
-    $cert = variable_get('cas_cert');
+    $cert = config_get('cas.settings', 'cas_cert');
     if (empty($cert)) {
       $requirements['cas_cert'] = array(
         'title' => $t('CAS SSL certificate bundle'),
@@ -170,271 +169,136 @@ function cas_requirements($phase) {
  * Implements hook_enable().
  */
 function cas_enable() {
-  drupal_set_message(t('CAS has been enabled. Please <a href="@url">configure</a> it.', array('@url' => url('admin/config/people/cas'))), 'warning');
+  backdrop_set_message(t('CAS has been enabled. Please <a href="@url">configure</a> it.', array('@url' => url('admin/config/people/cas'))), 'warning');
+}
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function cas_update_1() { }
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function cas_update_6300() { }
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function cas_update_6301() { }
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function cas_update_6302() { }
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function cas_update_6303() { }
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function cas_update_6304() { }
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function cas_update_7000(&$sandbox) { }
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function cas_update_7101() { }
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function cas_update_7102() { }
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function cas_update_7103() { }
+
+// TODO The old hook_update_N functions cannot be applied to Backdrop.
+function cas_update_7104() { }
+
+/**
+ * Implements hook_update_last_removed().
+ */
+function cas_update_last_removed() {
+  return 7104;
 }
 
 /**
- * Creates CAS login data table for Single-Sign-Out.
+ * Migrate cas variables to config.
  */
-function cas_update_1() {
-  $schema = array();
+function cas_update_1000() {
+  $config = config('cas.settings');
+  $config->set('cas_library_dir', update_variable_get('cas_library_dir', 'CAS'));
+  $config->set('cas_version', update_variable_get('cas_version', '3.0'));
+  $config->set('cas_server', update_variable_get('cas_server', ''));
+  $config->set('cas_port', update_variable_get('cas_port', '443'));
+  $config->set('cas_uri', update_variable_get('cas_uri', ''));
+  $config->set('cas_cert', update_variable_get('cas_cert', ''));
+  $config->set('cas_login_form', update_variable_get('cas_login_form', CAS_NO_LINK));
+  $config->set('cas_login_invite', update_variable_get('cas_login_invite', CAS_LOGIN_INVITE_DEFAULT));
+  $config->set('cas_login_drupal_invite', update_variable_get('cas_login_drupal_invite', CAS_LOGIN_BACKDROP_INVITE_DEFAULT));
+  $config->set('cas_login_redir_message', update_variable_get('cas_login_redir_message', CAS_LOGIN_REDIR_MESSAGE));
+  $config->set('cas_login_message', update_variable_get('cas_login_message', 'Logged in via CAS as %cas_username.'));
+  $config->set('cas_user_register', update_variable_get('cas_user_register', TRUE));
+  $config->set('cas_domain', update_variable_get('cas_domain', ''));
+  $config->set('cas_auto_assigned_role', update_variable_get('cas_auto_assigned_role', array(BACKDROP_AUTHENTICATED_ROLE => TRUE)));
+  $config->set('cas_hide_email', update_variable_get('cas_hide_email', '0'));
+  $config->set('cas_hide_password', update_variable_get('cas_hide_password', '0'));
+  $config->set('cas_allow_rememberme', update_variable_get('cas_allow_rememberme', '0'));
+  $config->set('cas_check_frequency', update_variable_get('cas_check_frequency', '-2'));
+  $config->set('cas_access', update_variable_get('cas_access', '0'));
+  $config->set('cas_pages', update_variable_get('cas_pages', ''));
+  $config->set('cas_exclude', update_variable_get('cas_exclude', CAS_EXCLUDE));
+  $config->set('cas_first_login_destination', update_variable_get('cas_first_login_destination', ''));
+  $config->set('cas_logout_destination', update_variable_get('cas_logout_destination', ''));
+  $config->set('cas_changePasswordURL', update_variable_get('cas_changePasswordURL', ''));
+  $config->set('cas_registerURL', update_variable_get('cas_registerURL', ''));
+  $config->set('cas_proxy', update_variable_get('cas_proxy', '0'));
+  $config->set('cas_pgtformat', update_variable_get('cas_pgtformat', 'plain'));
+  $config->set('cas_pgtpath', update_variable_get('cas_pgtpath', ''));
+  $config->set('cas_proxy_list', update_variable_get('cas_proxy_list', ''));
+  $config->set('cas_debugfile', update_variable_get('cas_debugfile', ''));
+  $config->set('cas_single_logout_session_lifetime', update_variable_get('cas_single_logout_session_lifetime', '25'));
+  $config->set('cas_cert_verify', update_variable_get('cas_cert_verify', 'none'));
+  $config->set('cas_authmap', update_variable_get('cas_authmap', '0'));
+  $config->set('cas_hijack_user', update_variable_get('cas_hijack_user', '0'));
+  $config->set('cas_first_login', update_variable_get('cas_first_login', array()));
+  $config->set('cas_logout_redirect', update_variable_get('cas_logout_redirect', array()));
+  $config->set('cas_check_first', update_variable_get('cas_check_first', array()));
+  $config->save();
 
-  $schema['cas_login_data'] = array(
-    'description' => 'Stores CAS session information.',
-    'fields' => array(
-      'cas_session_id' => array(
-        'description' => 'CAS session ID',
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-      ),
-      'uid' => array(
-        'description' => 'The {users}.uid associated with the CAS session.',
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ),
-    ),
-    'primary key' => array('cas_session_id'),
-  );
-
-  db_create_table('cas_login_data', $schema['cas_login_data']);
+  update_variable_del('cas_library_dir');
+  update_variable_del('cas_version');
+  update_variable_del('cas_server');
+  update_variable_del('cas_port');
+  update_variable_del('cas_uri');
+  update_variable_del('cas_cert');
+  update_variable_del('cas_login_form');
+  update_variable_del('cas_login_invite');
+  update_variable_del('cas_login_drupal_invite');
+  update_variable_del('cas_login_redir_message');
+  update_variable_del('cas_login_message');
+  update_variable_del('cas_user_register');
+  update_variable_del('cas_domain');
+  update_variable_del('cas_auto_assigned_role');
+  update_variable_del('cas_hide_email');
+  update_variable_del('cas_hide_password');
+  update_variable_del('cas_allow_rememberme');
+  update_variable_del('cas_check_frequency');
+  update_variable_del('cas_access');
+  update_variable_del('cas_pages');
+  update_variable_del('cas_exclude');
+  update_variable_del('cas_first_login_destination');
+  update_variable_del('cas_logout_destination');
+  update_variable_del('cas_changePasswordURL');
+  update_variable_del('cas_registerURL');
+  update_variable_del('cas_proxy');
+  update_variable_del('cas_pgtformat');
+  update_variable_del('cas_pgtpath');
+  update_variable_del('cas_proxy_list');
+  update_variable_del('cas_debugfile');
+  update_variable_del('cas_single_logout_session_lifetime');
+  update_variable_del('cas_cert_verify');
+  update_variable_del('cas_authmap');
+  update_variable_del('cas_hijack_user');
+  update_variable_del('cas_first_login');
+  update_variable_del('cas_logout_redirect');
+  update_variable_del('cas_check_first');
 }
 
 /**
- * Depreciate "Verify the server using PEM cerificate" option.
+ * Implements hook_install().
  */
-function cas_update_6300() {
-  if (variable_get('cas_cert_verify', 'none') == 'verify') {
-    variable_set('cas_cert_verify', 'none');
-  }
-}
-
-/**
- * Migrate authmap entries to new {cas_user} table.
- */
-function cas_update_6301() {
-  $schema = array();
-
-  $schema['cas_user'] = array(
-    'description' => 'Stores CAS authentication mapping.',
-    'fields' => array(
-      'aid' => array(
-        'description' => 'Primary Key: Unique CAS authentication mapping ID.',
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ),
-      'uid' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => "User's {users}.uid.",
-      ),
-      'cas_name' => array(
-        'type' => 'varchar',
-        'length' => 128,
-        'not null' => TRUE,
-        'default' => '',
-        'description' => 'Unique CAS username.',
-      ),
-    ),
-    'unique keys' => array(
-      'cas_name' => array('cas_name'),
-    ),
-    'primary key' => array('aid'),
-    'foreign keys' => array(
-      'user' => array(
-        'table' => 'users',
-        'columns' => array('uid' => 'uid'),
-      ),
-    ),
-  );
-
-  // Create {cas_user} table.
-  db_create_table('cas_user', $schema['cas_user']);
-
-  // Migrate entries from {authmap} to {cas_user}.
-  $query = db_select('authmap', 'a')
-    ->condition('module', 'cas')
-    ->condition('uid', 0, '<>');
-  $query->addField('a', 'uid');
-  $query->addField('a', 'authname', 'cas_name');
-  db_insert('cas_user')
-    ->from($query)
-    ->execute();
-
-  // Remove old entries in {authmap}.
-  db_delete('authmap')
-    ->condition('module', 'cas')
-    ->execute();
-}
-
-/**
- * Remove 'hijack user' and 'Drupal is CAS user repository' options.
- */
-function cas_update_6302() {
-  $message = NULL;
-  $t = get_t();
-
-  if (variable_get('cas_authmap', 0) || variable_get('cas_hijack_user', 0)) {
-    // Create a mapping in {cas_user} for each current Drupal user.
-    // The code below generates SQL equivalent to:
-    //   INSERT INTO cas_user (uid, cas_name)
-    //   SELECT u.uid AS uid, u.name as cas_name
-    //   FROM users u
-    //   WHERE uid <> 0 AND NOT EXISTS (SELECT cas_name FROM cas_user c WHERE c.cas_name = u.name);
-
-    $query = db_select('users', 'u');
-    $query->addField('u', 'uid', 'uid');
-    $query->addField('u', 'name', 'cas_name');
-    $query->condition('uid', 0, '<>');
-    $query->notExists(
-      db_select('cas_user', 'c')
-      ->fields('c', array('cas_name'))
-      ->where('c.cas_name = u.name')
-    );
-    db_insert('cas_user')
-      ->from($query)
-      ->execute();
-
-    $message = $t('Users have been automatically assigned their CAS username. For more information, see "Associating CAS usernames with Drupal users" in the CAS module README.txt.');
-  }
-
-  variable_del('cas_authmap');
-  variable_del('cas_hijack_user');
-  return $message;
-}
-
-/**
- * Remove unnecessary CAS settings.
- */
-function cas_update_6303() {
-  // We have removed the cas_first_login option, and instead verify that
-  // cas_first_login_destination is non-empty. To preserve functionality,
-  // we need to update the destination to '<front>' if previously the option
-  // was selected but the destination was empty.
-  if (variable_get('cas_first_login', FALSE)) {
-    if (variable_get('cas_first_login_destination', '') == '') {
-      variable_set('cas_first_login_destination', '<front>');
-    }
-  }
-  else {
-    variable_set('cas_first_login_destination', '');
-  }
-  variable_del('cas_first_login');
-
-  // Similarly for the cas_logout_redirect and cas_logout_destination
-  // variables.
-  if (variable_get('cas_logout_redirect', FALSE)) {
-    if (variable_get('cas_logout_destination', '') == '') {
-      variable_set('cas_logout_destination', '<front>');
-    }
-  }
-  else {
-    variable_set('cas_logout_destination', '');
-  }
-  variable_del('cas_logout_redirect');
-
-  // If the Certicate Authority is not being verified, ensure that the
-  // certificate field is empty.
-  if (variable_get('cas_cert_verify', 'none') == 'none') {
-    variable_set('cas_cert', '');
-  }
-  variable_del('cas_cert_verify');
-
-  // Also remove the variable controlling CAS Single Sign-Out which is now
-  // always enabled.
-  variable_del('cas_signout');
-
-  return array();
-}
-
-/**
- * Add destination parameter to CAS Login / CAS Logout menu links.
- */
-function cas_update_6304() {
-  // Load and save each link to 'cas' or 'caslogout' so that the 'alter' option
-  // is enabled. This allows us to append the destination parameter to the
-  // links at runtime. Since the menu items 'cas' and 'caslogout' are not
-  // functional without the destination parameter, we do this for all menu
-  // links, even custom defined ones (i.e., those with module = 'menu').
-  $result = db_query("SELECT mlid FROM {menu_links} WHERE link_path IN (:link_path)", array(':link_path' => array('cas', 'caslogout')));
-  foreach ($result as $record) {
-    $link = menu_link_load($record->mlid);
-    menu_link_save($link);
-  }
-}
-
-/**
- * Transform numeric block deltas to string block deltas.
- */
-function cas_update_7000(&$sandbox) {
-  $renamed_deltas = array(
-    'cas' => array('0' => 'login'),
-  );
-  $moved_deltas = array();
-  update_fix_d7_block_deltas($sandbox, $renamed_deltas, $moved_deltas);
-}
-
-/**
- * Use variable 'cas_check_frequency' instead of 'cas_gateway'.
- */
-function cas_update_7101() {
-  if (variable_get('cas_check_first', NULL) === NULL) {
-    // The old variable was not set, nothing to do.
-    return;
-  }
-
-  if (variable_get('cas_check_first', FALSE)) {
-    // Check once, but not again until login.
-    variable_set('cas_check_frequency', -1);
-  }
-  else {
-    // Check never.
-    variable_set('cas_check_frequency', -2);
-  }
-  variable_del('cas_check_first');
-}
-
-/**
- * Add index on cas_user.uid
- */
-function cas_update_7102() {
-  if (!db_index_exists('cas_user', 'cas_user')) {
-    db_add_index('cas_user', 'cas_user', array('uid'));
-  }
-}
-
-/**
- * Add created column to cas_login_data table.
- */
-function cas_update_7103() {
-  db_add_field('cas_login_data', 'created', array(
-    'type' => 'int',
-    'not null' => TRUE,
-    'default' => 0,
-    'description' => 'Timestamp when this record was created.',
-  ));
-  $now = time();
-  // Assume that all data was inserted today. This is obviously not true, but
-  // it will prevent us from deleting the existing data for some time, since
-  // the cron task will only delete data older than X days.
-  db_update('cas_login_data')
-    ->fields(array('created' => $now))
-    ->execute();
-}
-
-/**
- * Hash all existing CAS session IDs in cas_login_data.
- */
-function cas_update_7104() {
-  $result = db_query('SELECT cas_session_id FROM {cas_login_data}');
-  foreach ($result as $data) {
-    db_update('cas_login_data')
-      ->fields(array('cas_session_id' => hash('sha256', $data->cas_session_id)))
-      ->condition('cas_session_id', $data->cas_session_id)
-      ->execute();
-  }
+function cas_install() {
+  // Dynamically generated variable data was detected.
+  // /cas/cas.module line 1391
 }

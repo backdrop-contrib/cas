@@ -22,9 +22,10 @@ function cas_batch_user_add($cas_name, &$context) {
   // Check if the account already exists.
   $existing_account = cas_user_load_by_name($cas_name);
 
-  if ($existing_account == TRUE){
+  if ($existing_account == TRUE) {
     $uri = entity_uri('user', $existing_account);
-    $context['results']['messages']['already_exist'][] = t('<a href="@url">%name</a>', array('@url' => url($uri['path'], $uri['options']), '%name' => format_username($existing_account)));;
+    $formattedName = user_format_name($existing_account);
+    $context['results']['messages']['already_exist'][] = t('<a href="@url">%name</a>', array('@url' => url($uri['path'], $uri['options']), '%name' => $formattedName));
     return;
   }
 
@@ -36,7 +37,8 @@ function cas_batch_user_add($cas_name, &$context) {
   }
   else {
     $uri = entity_uri('user', $account);
-    $context['results']['messages']['newly_created'][] = t('<a href="@url">%name</a>', array('@url' => url($uri['path'], $uri['options']), '%name' => format_username($account)));
+    $formattedName = user_format_name($account);
+    $context['results']['messages']['newly_created'][] = t('<a href="@url">%name</a>', array('@url' => url($uri['path'], $uri['options']), '%name' => $formattedName));
     return $account;
   }
 }
@@ -48,19 +50,19 @@ function cas_batch_user_add($cas_name, &$context) {
 function cas_batch_user_finished($success, $results, $operations) {
   if ($success) {
     if (!empty($results['messages']['error'])) {
-      drupal_set_message(t('Error occurred during account creation of %count CAS username(s): !usernames', array('%count' => count($results['messages']['error']), '!usernames' => implode(', ', $results['messages']['error']))), 'warning');
+      backdrop_set_message(t('Error occurred during account creation of %count CAS username(s): !usernames', array('%count' => count($results['messages']['error']), '!usernames' => implode(', ', $results['messages']['error']))), 'warning');
     }
     if (!empty($results['messages']['already_exist'])) {
-      drupal_set_message(t('The following %count CAS username(s) are already in use on this site: !usernames', array('%count' => count($results['messages']['already_exist']), '!usernames' => implode(', ', $results['messages']['already_exist']))), 'warning');
+      backdrop_set_message(t('The following %count CAS username(s) are already in use on this site: !usernames', array('%count' => count($results['messages']['already_exist']), '!usernames' => implode(', ', $results['messages']['already_exist']))), 'warning');
     }
     if (!empty($results['messages']['newly_created'])) {
-      drupal_set_message(t('The following %count CAS usernames were created: !usernames', array('%count' => count($results['messages']['newly_created']), '!usernames' => implode(', ', $results['messages']['newly_created']))));
+      backdrop_set_message(t('The following %count CAS usernames were created: !usernames', array('%count' => count($results['messages']['newly_created']), '!usernames' => implode(', ', $results['messages']['newly_created']))));
     }
   }
   else {
     // An error occurred.
     // $operations contains the operations that remained unprocessed.
     $error_operation = reset($operations);
-    drupal_set_message(t('An error occurred while processing @operation with arguments : @args', array('@operation' => $error_operation[0], '@args' => print_r($error_operation[0], TRUE))));
+    backdrop_set_message(t('An error occurred while processing @operation with arguments : @args', array('@operation' => $error_operation[0], '@args' => print_r($error_operation[0], TRUE))));
   }
 }
