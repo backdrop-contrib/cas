@@ -1129,7 +1129,7 @@ class phpCAS
 
         $auth = self::$_PHPCAS_CLIENT->checkAuthentication();
 
-        // store where the authentication has been checked and the result
+        // store where the authentication has been checked and the result.
         self::$_PHPCAS_CLIENT->markAuthenticationCall($auth);
 
         phpCAS :: traceEnd($auth);
@@ -1178,7 +1178,7 @@ class phpCAS
         // store where the authentication has been checked and the result
         self::$_PHPCAS_CLIENT->markAuthenticationCall($auth);
 
-        //self::$_PHPCAS_CLIENT->renewAuthentication();
+        // self::$_PHPCAS_CLIENT->renewAuthentication();
         phpCAS :: traceEnd();
     }
 

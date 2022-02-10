@@ -56,7 +56,7 @@ class CasTestHelper extends BackdropWebTestCase {
     $filename = 'CAS-' . $version . '.tgz';
     $url = 'https://developer.jasig.org/cas-clients/php/' . $version . '/' . $filename;
 
-    // Avoid downloading the file dozens of times
+    // Avoid downloading the file dozens of times.
     $simpletest_cache = $this->originalFileDirectory . '/simpletest/cas';
     if (!file_exists($simpletest_cache)) {
       mkdir($simpletest_cache);
@@ -574,13 +574,13 @@ class CasLoginRedirectionTestCase extends CasTestHelper {
     $cas_name = $account->cas_name;
     $this->setCasUser($cas_name);
 
-    // Test going to 'cas'
+    // Test going to 'cas'.
     $this->backdropGet('cas');
     $this->assertLoggedIn($account);
     $this->assertUrl('');
     $this->backdropLogout();
 
-    // Test going to 'cas?destination=node/$node1->nid'
+    // Test going to 'cas?destination=node/$node1->nid'.
     $destination = "node/$node1->nid";
     $this->backdropGet('cas', array('query' => array('destination' => $destination)));
     $this->assertLoggedIn($account);
@@ -679,7 +679,7 @@ class CasSingleSignOutTestCase extends CasTestHelper {
     $this->assertLoggedOut();
 
     // @todo: Add additional tests for other methods of logging in (especially
-//   methods coming from cas_pages).
+    //   methods coming from cas_pages).
   }
 
   function testSingleSignOutDoubleEncode() {
@@ -750,14 +750,14 @@ class CasGatewayTestCase extends CasTestHelper {
     config_set('cas.settings', 'cas_check_frequency', CAS_CHECK_ONCE);
     $this->backdropGet('');
     $this->assertLoggedIn($account);
-    // Logging out should immediately log a user back in
+    // Logging out should immediately log a user back in.
     $this->backdropGet('user/logout');
     $this->assertLoggedIn($account);
 
     config_set('cas.settings', 'cas_check_frequency', CAS_CHECK_ALWAYS);
     $this->backdropGet('');
     $this->assertLoggedIn($account);
-    // Logging out should immediately log a user back in
+    // Logging out should immediately log a user back in.
     $this->backdropGet('user/logout');
     $this->assertLoggedIn($account);
   }

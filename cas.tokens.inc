@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Token module integration.
+ * Token integration.
  */
 
 /**

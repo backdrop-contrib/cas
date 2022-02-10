@@ -10,7 +10,7 @@
  * @see http://drupal.org/node/1354
  */
 function cas_views_data() {
-  // cas_user table
+  // cas_user table.
 
   $data['cas_user']['table']['group'] = t('User');
 

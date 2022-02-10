@@ -8,17 +8,15 @@ introduction, please see the CAS website: https://www.apereo.org/projects/cas
 Requirements
 ------------
 
-Minimum of PHP 5.3 with the following extensions: curl, openssl, dom, zlib, and xml
+Minimum of PHP 5.6 with the following extensions: curl, openssl, dom, zlib, and xml
 
 
 Installation
 ------------
+Install this module using the official Backdrop CMS instructions at
+https://docs.backdropcms.org/documentation/extend-with-modules.
 
-  - Place the cas folder in your Drupal modules directory.
-
-  - Go to Functionality > List modules and enable this module.
-
-  - Go to Configuration > User accounts > CAS settings to configure the CAS module.		
+  - Navigate to Configuration > User accounts > CAS settings to configure the CAS module.
 
 
 Differences from Drupal 7
@@ -38,7 +36,7 @@ Bugs and feature requests should be reported in [the Issue Queue](https://github
 Current Maintainers
 -------------------
 
-Rick Bargerhuff](https://github.com/rbargerhuff).
+[Rick Bargerhuff](https://github.com/rbargerhuff).
 
 Seeking additional maintainers.
 

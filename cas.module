@@ -58,10 +58,10 @@ function cas_init() {
  * Implements hook_config_info().
  */
 function cas_config_info() {
-  $prefixes['cas.settings'] = array(
+  $prefixes['cas.settings'] = [
     'label' => t('CAS settings'),
     'group' => t('Configuration'),
-  );
+  ];
   return $prefixes;
 }
 
@@ -77,7 +77,7 @@ function cas_login_check($force_authentication = TRUE) {
   $config = config('cas.settings');
   global $user;
   if ($user->uid) {
-    //Don't Login  because we already are
+    // Don't Login  because we already are.
     return;
   }
 
@@ -87,21 +87,20 @@ function cas_login_check($force_authentication = TRUE) {
     return;
   }
 
-  // Start a backdrop session
+  // Start a backdrop session.
   backdrop_session_start();
-  _cas_single_sign_out_save_ticket(); // We use this later for CAS 3 logoutRequests
+  _cas_single_sign_out_save_ticket(); // We use this later for CAS 3 logoutRequests.
 
   // Initialize phpCAS if possible, otherwise just back out.
   if (cas_phpcas_init() === FALSE) {
     return;
   }
 
-  // We're going to try phpCAS auth test
+  // We're going to try phpCAS auth test.
   if ($force_authentication) {
     try {
       phpCAS::forceAuthentication();
-    }
-    catch (CAS_AuthenticationException $e) {
+    } catch (CAS_AuthenticationException $e) {
       backdrop_set_message(t('Error authenticating with CAS. Please try again or contact your website administrator if the problem persists.'), 'error');
       watchdog_exception('cas', $e);
       // We have to redirect the user somewhere else because the CAS exception
@@ -122,20 +121,19 @@ function cas_login_check($force_authentication = TRUE) {
   }
 
   // Build the cas_user object and allow modules to alter it.
-  $cas_user = array(
+  $cas_user = [
     'name' => phpCAS::getUser(),
     'login' => TRUE,
     'register' => $config->get('cas_user_register'),
     'attributes' => cas_phpcas_attributes(),
-  );
+  ];
   backdrop_alter('cas_user', $cas_user);
 
-  // Bail out if a module denied login access for this user or unset the user
-  // name.
+  // Bail out if a module denied login access for this user or unset the user name.
   if (empty($cas_user['login']) || empty($cas_user['name'])) {
     // Only set a warning if we forced login.
     if ($force_authentication) {
-      backdrop_set_message(t('The user account %name is not available on this site.', array('%name' => $cas_user['name'])), 'error');
+      backdrop_set_message(t('The user account %name is not available on this site.', ['%name' => $cas_user['name']]), 'error');
     }
     return;
   }
@@ -143,7 +141,7 @@ function cas_login_check($force_authentication = TRUE) {
   // Proceed with the login process, using the altered CAS username.
   $cas_name = $cas_user['name'];
 
-  // blocked user check
+  // blocked user check.
   $blocked = FALSE;
   if (_cas_external_user_is_blocked($cas_name)) {
     $blocked = 'The username %cas_name has been blocked.';
@@ -152,8 +150,8 @@ function cas_login_check($force_authentication = TRUE) {
   if ($blocked) {
     // Only display error messages only if the user intended to log in.
     if ($force_authentication) {
-      watchdog('cas', $blocked, array('%cas_name' => $cas_name), WATCHDOG_WARNING);
-      backdrop_set_message(t($blocked, array('%cas_name' => $cas_name)), 'error');
+      watchdog('cas', $blocked, ['%cas_name' => $cas_name], WATCHDOG_WARNING);
+      backdrop_set_message(t($blocked, ['%cas_name' => $cas_name]), 'error');
     }
     return;
   }
@@ -168,20 +166,20 @@ function cas_login_check($force_authentication = TRUE) {
     if (!$account) {
       // The account could not be created, set a message.
       if ($force_authentication) {
-        backdrop_set_message(t('A new account could not be created for %cas_name. The username is already in use on this site.', array('%cas_name' => $cas_name)), 'error');
+        backdrop_set_message(t('A new account could not be created for %cas_name. The username is already in use on this site.', ['%cas_name' => $cas_name]), 'error');
       }
       return;
     }
   }
 
-  // final check to make sure we have a good user
+  // final check to make sure we have a good user.
   if ($account && $account->uid > 0) {
     // Save the altered CAS name for future use.
     $_SESSION['cas_name'] = $cas_name;
 
     $cas_first_login = !$account->login;
 
-    // Save single sign out information
+    // Save single sign out information.
     if (!empty($_SESSION['cas_ticket'])) {
       _cas_single_sign_out_save_token($account);
     }
@@ -210,7 +208,7 @@ function cas_login_check($force_authentication = TRUE) {
 
     $formattedName = user_format_name($user);
 
-    backdrop_set_message(t($config->get('cas_login_message'), array('%cas_username' => $formattedName)));
+    backdrop_set_message(t($config->get('cas_login_message'), ['%cas_username' => $formattedName]));
     if (!empty($edit['persistent_login'])) {
       backdrop_set_message(t('You will remain logged in on this computer even after you close your browser.'));
     }
@@ -224,7 +222,7 @@ function cas_login_check($force_authentication = TRUE) {
 
     // Only display error messages only if the user intended to log in.
     if ($force_authentication) {
-      backdrop_set_message(t('No account found for %cas_name.', array('%cas_name' => $cas_name)), 'error');
+      backdrop_set_message(t('No account found for %cas_name.', ['%cas_name' => $cas_name]), 'error');
     }
   }
 }
@@ -270,18 +268,18 @@ function cas_phpcas_init() {
   }
   $initialized = TRUE;
 
-  // Variable set
-  $server_version    = (string) $config->get('cas_version');
+  // Variable set.
+  $server_version = (string) $config->get('cas_version');
   $server_cas_server = (string) $config->get('cas_server');
-  $server_port       = (int) $config->get('cas_port');
-  $server_uri        = (string) $config->get('cas_uri');
-  $cas_cert          = (string) $config->get('cas_cert');
-  $debug_file        = (string) $config->get('cas_debugfile');
+  $server_port = (int) $config->get('cas_port');
+  $server_uri = (string) $config->get('cas_uri');
+  $cas_cert = (string) $config->get('cas_cert');
+  $debug_file = (string) $config->get('cas_debugfile');
 
   // Back out if there's no configured CAS server hostname. This is the
   // minimum required configuration to initialize phpCAS.
   if (empty($server_cas_server)) {
-    watchdog('cas', 'Unable to initialize phpCAS because no CAS server hostname has been configured.', array(), WATCHDOG_ERROR);
+    watchdog('cas', 'Unable to initialize phpCAS because no CAS server hostname has been configured.', [], WATCHDOG_ERROR);
     return FALSE;
   }
 
@@ -306,14 +304,14 @@ function cas_phpcas_init() {
     phpCAS::client($server_version, $server_cas_server, $server_port, $server_uri, $start_session);
   }
 
-  //Add CAS proxy lists allowed
+  // Add CAS proxy lists allowed.
   $proxy_list = $config->get('cas_proxy_list');
   if ($proxy_list) {
     $proxy_list = explode("\n", $proxy_list);
     phpCAS::allowProxyChain(new CAS_ProxyChain($proxy_list));
   }
 
-  // force CAS authentication
+  // force CAS authentication.
   if ($cas_cert = $config->get('cas_cert')) {
     phpCAS::setCasServerCACert($cas_cert);
   }
@@ -321,7 +319,10 @@ function cas_phpcas_init() {
     phpCAS::setNoCasServerValidation();
   }
 
-  phpCAS::setFixedServiceURL(url(current_path(), array('query' => backdrop_get_query_parameters(), 'absolute' => TRUE)));
+  phpCAS::setFixedServiceURL(url(current_path(), [
+    'query' => backdrop_get_query_parameters(),
+    'absolute' => TRUE,
+  ]));
   phpCAS::setCacheTimesForAuthRecheck((int) $config->get('cas_check_frequency'));
 
   // Allow other modules to call phpCAS routines. We do not call
@@ -334,23 +335,13 @@ function cas_phpcas_init() {
  * Implements hook_permission().
  */
 function cas_permission() {
-  return array(
-    'administer cas' => array(
+  return [
+    'administer cas' => [
       'title' => t('Administer CAS'),
       'description' => t('Configure CAS server, default CAS user roles, login/logout redirection, and other settings.'),
       'restrict access' => TRUE,
-    )
-  );
-}
-
-/**
- * Implements hook_help().
- */
-function cas_help($section) {
-  switch ($section) {
-    case 'admin/help#cas':
-      return t("Allows users to authenticate via a Central Authentication Service.");
-  }
+    ],
+  ];
 }
 
 /**
@@ -358,62 +349,62 @@ function cas_help($section) {
  */
 function cas_menu() {
   global $user;
-  $items = array();
-  //cas_login_check();
-  $items['admin/config/people/cas'] = array(
+  $items = [];
+  // cas_login_check();
+  $items['admin/config/people/cas'] = [
     'title' => 'CAS settings',
     'description' => 'Configure central authentication services',
     'page callback' => 'backdrop_get_form',
-    'page arguments' => array('cas_admin_settings'),
-    'access arguments' => array('administer cas'),
+    'page arguments' => ['cas_admin_settings'],
+    'access arguments' => ['administer cas'],
     'type' => MENU_NORMAL_ITEM,
     'file' => 'cas.admin.inc',
-  );
-  $items['admin/config/people/cas/settings'] = array(
+  ];
+  $items['admin/config/people/cas/settings'] = [
     'title' => 'CAS',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
-  );
-  $items['admin/people/cas/create'] = array(
+  ];
+  $items['admin/people/cas/create'] = [
     'title' => 'Add CAS user(s)',
     'page callback' => 'backdrop_get_form',
-    'page arguments' => array('cas_add_user_form'),
-    'access arguments' => array('administer users'),
+    'page arguments' => ['cas_add_user_form'],
+    'access arguments' => ['administer users'],
     'type' => MENU_LOCAL_ACTION,
     'file' => 'cas.user.inc',
     'tab_parent' => 'admin/people',
     'weight' => 1,
-  );
-  $items['user/%user/cas'] = array(
+  ];
+  $items['user/%user/cas'] = [
     'title' => 'CAS',
     'page callback' => 'cas_user_identities',
-    'page arguments' => array(1),
-    'access arguments' => array('administer users'),
+    'page arguments' => [1],
+    'access arguments' => ['administer users'],
     'type' => MENU_LOCAL_TASK,
     'file' => 'cas.pages.inc',
     'tab_parent' => 'user/%/edit',
     'weight' => 1,
-  );
-  $items['user/%user/cas/delete'] = array(
+  ];
+  $items['user/%user/cas/delete'] = [
     'title' => 'Delete CAS username',
     'page callback' => 'backdrop_get_form',
-    'page arguments' => array('cas_user_delete_form', 1),
-    'access arguments' => array('administer users'),
+    'page arguments' => ['cas_user_delete_form', 1],
+    'access arguments' => ['administer users'],
     'file' => 'cas.pages.inc',
-  );
-  $items['cas'] = array(
+  ];
+  $items['cas'] = [
     'path' => 'cas',
     'title' => 'CAS Login',
     'page callback' => 'cas_login_page',
     'access callback' => 'user_is_anonymous',
     'type' => MENU_SUGGESTED_ITEM,
-  );
-  $items['caslogout'] = array(
+  ];
+  $items['caslogout'] = [
     'title' => 'CAS Logout',
     'page callback' => 'cas_logout',
     'access callback' => 'cas_user_is_logged_in',
     'type' => MENU_SUGGESTED_ITEM,
-  );
+  ];
   return $items;
 }
 
@@ -433,8 +424,8 @@ function cas_cron() {
 }
 
 /**
- * @todo Please document this function.
  * @see http://drupal.org/node/1354
+ * @todo Please document this function.
  */
 function cas_user_is_logged_in() {
   return user_is_logged_in() || !empty($_SESSION['phpCAS']['user']);
@@ -454,6 +445,7 @@ function cas_menu_site_status_alter(&$menu_site_status, $path) {
  * Implements hook_menu_link_alter().
  *
  * Flag this link as needing alter at display time.
+ *
  * @see cas_translated_menu_link_alter()
  */
 function cas_menu_link_alter(&$item) {
@@ -486,15 +478,15 @@ function cas_translated_menu_link_alter(&$item) {
 /**
  * Implements hook_user_operations().
  */
-function cas_user_operations($form = array(), $form_state = array()) {
-  $operations['cas_create'] = array(
+function cas_user_operations($form = [], $form_state = []) {
+  $operations['cas_create'] = [
     'label' => t('Create CAS username'),
     'callback' => 'cas_user_operations_create_username',
-  );
-  $operations['cas_remove'] = array(
+  ];
+  $operations['cas_remove'] = [
     'label' => t('Remove CAS usernames'),
     'callback' => 'cas_user_operations_remove_usernames',
-  );
+  ];
   return $operations;
 }
 
@@ -515,12 +507,12 @@ function cas_user_operations_create_username($uids) {
       ->condition('uid', $account->uid, '<>')
       ->countQuery()->execute()->fetchfield();
     if ($count) {
-      backdrop_set_message(t('CAS username %username already in use.', array('%username' => $account->name)), 'error');
+      backdrop_set_message(t('CAS username %username already in use.', ['%username' => $account->name]), 'error');
       continue;
     }
     db_merge('cas_user')
-      ->key(array('cas_name' => $account->name))
-      ->fields(array('uid' => $account->uid))
+      ->key(['cas_name' => $account->name])
+      ->fields(['uid' => $account->uid])
       ->execute();
   }
 }
@@ -543,10 +535,10 @@ function cas_user_operations_remove_usernames($uids) {
  * Implements hook_admin_paths().
  */
 function cas_admin_paths() {
-  $paths = array(
+  $paths = [
     'user/*/cas' => TRUE,
     'user/*/cas/delete/*' => TRUE,
-  );
+  ];
   return $paths;
 }
 
@@ -558,9 +550,9 @@ function cas_admin_paths() {
  */
 function cas_user_load($users) {
   foreach (array_keys($users) as $uid) {
-    $users[$uid]->cas_names = array();
+    $users[$uid]->cas_names = [];
   }
-  $result = db_query('SELECT aid, uid, cas_name FROM {cas_user} WHERE uid IN (:uids)', array(':uids' => array_keys($users)));
+  $result = db_query('SELECT aid, uid, cas_name FROM {cas_user} WHERE uid IN (:uids)', [':uids' => array_keys($users)]);
   foreach ($result as $record) {
     $users[$record->uid]->cas_names[$record->aid] = $record->cas_name;
   }
@@ -577,14 +569,14 @@ function cas_user_load($users) {
 function cas_user_insert($account) {
   if (!empty($account->cas_name)) {
     db_insert('cas_user')
-      ->fields(array(
+      ->fields([
         'cas_name' => $account->cas_name,
         'uid' => $account->uid,
-      ))
+      ])
       ->execute();
   }
   // Update $account to reflect changes.
-  $users = array($account->uid => $account);
+  $users = [$account->uid => $account];
   cas_user_load($users);
 }
 
@@ -615,7 +607,7 @@ function cas_user_update($account) {
       // Change a CAS username.
       if ($cas_name != $account->cas_names[$aid]) {
         db_update('cas_user')
-          ->fields(array('cas_name' => $cas_name))
+          ->fields(['cas_name' => $cas_name])
           ->condition('uid', $account->uid)
           ->condition('aid', $aid)
           ->execute();
@@ -627,15 +619,15 @@ function cas_user_update($account) {
     if (!empty($cas_name)) {
       // Add a CAS username.
       db_insert('cas_user')
-        ->fields(array(
+        ->fields([
           'uid' => $account->uid,
           'cas_name' => $cas_name,
-        ))
+        ])
         ->execute();
     }
   }
   // Update $account to reflect changes.
-  $users = array($account->uid => $account);
+  $users = [$account->uid => $account];
   cas_user_load($users);
 }
 
@@ -668,16 +660,21 @@ function cas_user_delete($account) {
  */
 function cas_user_load_by_name($cas_name, $alter = FALSE, $reset = FALSE) {
   if ($alter) {
-    $cas_user = array(
+    $cas_user = [
       'name' => $cas_name,
       'login' => TRUE,
       'register' => FALSE,
-    );
+    ];
     backdrop_alter('cas_user', $cas_user);
     $cas_name = $cas_user['name'];
   }
 
-  $uid = db_select('cas_user')->fields('cas_user', array('uid'))->condition('cas_name', db_like($cas_name), 'LIKE')->range(0, 1)->execute()->fetchField();
+  $uid = db_select('cas_user')
+    ->fields('cas_user', ['uid'])
+    ->condition('cas_name', db_like($cas_name), 'LIKE')
+    ->range(0, 1)
+    ->execute()
+    ->fetchField();
   if ($uid) {
     return user_load($uid, $reset);
   }
@@ -731,21 +728,21 @@ function cas_logout($invoke_hook = TRUE) {
 
   //Make it an absolute url.  This will also convert <front> to the front page.
   if ($destination) {
-    $destination_url = url($destination, array('absolute' => TRUE));
-    $options = array(
+    $destination_url = url($destination, ['absolute' => TRUE]);
+    $options = [
       'service' => $destination_url,
       'url' => $destination_url,
-    );
+    ];
   }
   else {
-    $options = array();
+    $options = [];
   }
 
   // Mimic user_logout().
   if ($invoke_hook) {
     $formattedName = user_format_name($user);
 
-    watchdog('user', 'Session closed for %name.', array('%name' => $formattedName));
+    watchdog('user', 'Session closed for %name.', ['%name' => $formattedName]);
     module_invoke_all('user_logout', $user);
   }
 
@@ -767,10 +764,10 @@ function cas_block_info() {
 /**
  * Implements hook_block_view().
  */
-function cas_block_view($delta = '', $settings = array(), $contexts = array()) {
+function cas_block_view($delta = '', $settings = [], $contexts = []) {
   global $user;
 
-  $block = array();
+  $block = [];
 
   switch ($delta) {
     case 'login':
@@ -788,19 +785,19 @@ function cas_block_view($delta = '', $settings = array(), $contexts = array()) {
  */
 function cas_login_block($form) {
   $config = config('cas.settings');
-  $form['#action'] = url('cas', array('query' => backdrop_get_destination()));
+  $form['#action'] = url('cas', ['query' => backdrop_get_destination()]);
   $form['#id'] = 'cas-login-form';
 
-  $form['cas_login_redirection_message'] = array(
+  $form['cas_login_redirection_message'] = [
     '#type' => 'item',
     '#markup' => t($config->get('cas_login_redir_message')),
     '#weight' => -1,
-  );
-  $form['actions'] = array('#type' => 'actions');
-  $form['actions']['submit'] = array(
+  ];
+  $form['actions'] = ['#type' => 'actions'];
+  $form['actions']['submit'] = [
     '#type' => 'submit',
     '#value' => t($config->get('cas_login_invite')),
-  );
+  ];
 
   return $form;
 }
@@ -809,11 +806,12 @@ function cas_login_block($form) {
  * Determine if we should automatically check if the user is authenticated.
  *
  * This implements part of the CAS gateway feature.
- * @see phpCAS::checkAuthentication()
  *
  * @return
  *   TRUE if we should query the CAS server to see if the user is already
  *   authenticated, FALSE otherwise.
+ * @see phpCAS::checkAuthentication()
+ *
  */
 function _cas_allow_check_for_login() {
   $config = config('cas.settings');
@@ -829,7 +827,7 @@ function _cas_allow_check_for_login() {
 
   // Check to see if we've got a search bot.
   if (isset($_SERVER['HTTP_USER_AGENT'])) {
-    $crawlers = array(
+    $crawlers = [
       'Google',
       'msnbot',
       'Rambler',
@@ -851,7 +849,7 @@ function _cas_allow_check_for_login() {
       'eStyle',
       'Scrubby',
       'gsa-crawler',
-      );
+    ];
     // Return on the first find.
     foreach ($crawlers as $c) {
       if (stripos($_SERVER['HTTP_USER_AGENT'], $c) !== FALSE) {
@@ -935,6 +933,7 @@ function _cas_force_login() {
 
   return $force_login;
 }
+
 /**
  * Implements hook_form_alter().
  *
@@ -952,50 +951,53 @@ function cas_form_alter(&$form, &$form_state, $form_id) {
     case 'user_login':
     case 'user_login_block':
       if ($config->get('cas_login_form') != CAS_NO_LINK) {
-        $form['#attached']['css'][] = backdrop_get_path('module', 'cas') . '/cas.css';
-        $form['#attached']['js'][] = backdrop_get_path('module', 'cas') . '/cas.js';
+        $form['#attached']['css'][] = backdrop_get_path('module', 'cas') . '/css/cas.css';
+        $form['#attached']['js'][] = backdrop_get_path('module', 'cas') . '/js/cas.js';
 
         if (!empty($form_state['input']['cas_identifier'])) {
           $form['name']['#required'] = FALSE;
           $form['pass']['#required'] = FALSE;
           unset($form['#validate']);
-          $form['#submit'] = array('cas_login_submit');
+          $form['#submit'] = ['cas_login_submit'];
         }
 
-        $items = array();
-        $items[] = array(
+        $items = [];
+        $items[] = [
           'data' => l(t($config->get('cas_login_invite')), '#'),
-          'class' => array('cas-link'),
-        );
+          'class' => ['cas-link'],
+        ];
 
-        $items[] = array(
+        $items[] = [
           'data' => l(t($config->get('cas_login_backdrop_invite')), '#'),
-          'class' => array('uncas-link'),
-        );
+          'class' => ['uncas-link'],
+        ];
 
-        $form['cas_links'] = array(
+        $form['cas_links'] = [
           '#theme' => 'item_list',
           '#items' => $items,
-          '#attributes' => array('class' => array('cas-links')),
+          '#attributes' => ['class' => ['cas-links']],
           '#weight' => 101,
-        );
+        ];
 
         $form['links']['#weight'] = 2;
 
-        $form['cas_login_redirection_message'] = array(
+        $form['cas_login_redirection_message'] = [
           '#type' => 'item',
           '#markup' => t($config->get('cas_login_redir_message')),
           '#weight' => -1,
-        );
+        ];
 
-        $form['cas_identifier'] = array(
+        $form['cas_identifier'] = [
           '#type' => 'checkbox',
           '#title' => t($config->get('cas_login_invite')),
           '#default_value' => $config->get('cas_login_form') == CAS_MAKE_DEFAULT,
           '#weight' => -1,
           '#description' => t($config->get('cas_login_redir_message')),
-        );
-        $form['cas.return_to'] = array('#type' => 'hidden', '#value' => user_login_destination());
+        ];
+        $form['cas.return_to'] = [
+          '#type' => 'hidden',
+          '#value' => user_login_destination(),
+        ];
       }
       break;
 
@@ -1007,19 +1009,19 @@ function cas_form_alter(&$form, &$form_state, $form_id) {
         $cas_names = $account->cas_names;
         $aids = array_keys($cas_names);
 
-        $element = array(
+        $element = [
           '#type' => 'textfield',
           '#title' => t('CAS username'),
           '#default_value' => array_shift($cas_names),
           '#cas_user_aid' => array_shift($aids),
-          '#description' => t('<a href="@url">Create, edit or delete</a> additional CAS usernames associated with this account.', array('@url' => url('user/' . $account->uid . '/cas'))),
-          '#element_validate' => array('_cas_name_element_validate'),
+          '#description' => t('<a href="@url">Create, edit or delete</a> additional CAS usernames associated with this account.', ['@url' => url('user/' . $account->uid . '/cas')]),
+          '#element_validate' => ['_cas_name_element_validate'],
           '#weight' => -9,
-        );
+        ];
 
         // See if any additional CAS usernames exist.
         if (!empty($cas_names)) {
-          $element['#description'] .= ' <br />' . t('Other CAS usernames: %cas_names.', array('%cas_names' => implode(', ', $cas_names)));
+          $element['#description'] .= ' <br />' . t('Other CAS usernames: %cas_names.', ['%cas_names' => implode(', ', $cas_names)]);
         }
         $form['account']['cas_name'] = $element;
       }
@@ -1038,8 +1040,8 @@ function cas_form_alter(&$form, &$form_state, $form_id) {
         // changing your e-mail address.
         $form['account']['current_pass']['#access'] = FALSE;
         $form['account']['current_pass_required_values']['#access'] = FALSE;
-        $form['account']['current_pass_required_values']['#value'] = array();
-        $form['#validate'] = array_diff($form['#validate'], array('user_validate_current_pass'));
+        $form['account']['current_pass_required_values']['#value'] = [];
+        $form['#validate'] = array_diff($form['#validate'], ['user_validate_current_pass']);
       }
       break;
 
@@ -1051,14 +1053,14 @@ function cas_form_alter(&$form, &$form_state, $form_id) {
 
     case 'user_register_form':
       if (user_access('administer users')) {
-        $form['account']['cas_name'] = array(
+        $form['account']['cas_name'] = [
           '#type' => 'textfield',
           '#title' => t('CAS username'),
           '#default_value' => '',
           '#description' => t('If necessary, additional CAS usernames can be added after the account is created.'),
-          '#element_validate' => array('_cas_name_element_validate'),
+          '#element_validate' => ['_cas_name_element_validate'],
           '#weight' => -9,
-        );
+        ];
       }
       elseif ($config->get('cas_registerURL') != '') {
         backdrop_goto($config->get('cas_registerURL'));
@@ -1067,14 +1069,14 @@ function cas_form_alter(&$form, &$form_state, $form_id) {
 
     case 'user_admin_account':
       // Insert the CAS username into the second column.
-      _cas_array_insert($form['accounts']['#header'], 1, array(
-        'cas' => array(
+      _cas_array_insert($form['accounts']['#header'], 1, [
+        'cas' => [
           'data' => 'CAS usernames',
-        ),
-      ));
+        ],
+      ]);
       foreach ($form['accounts']['#options'] as $uid => &$row) {
-        $cas_usernames = db_query('SELECT cas_name FROM {cas_user} WHERE uid = :uid', array(':uid' => $uid))->fetchCol();
-        $row['cas'] = theme('item_list', array('items' => $cas_usernames));
+        $cas_usernames = db_query('SELECT cas_name FROM {cas_user} WHERE uid = :uid', [':uid' => $uid])->fetchCol();
+        $row['cas'] = theme('item_list', ['items' => $cas_usernames]);
       }
       break;
   }
@@ -1094,7 +1096,7 @@ function _cas_name_element_validate($element, &$form_state) {
   }
 
   $query = db_select('cas_user')
-    ->fields('cas_user', array('uid'))
+    ->fields('cas_user', ['uid'])
     ->condition('cas_name', $element['#value']);
 
   // If set, we ignore entries with a specified authmap id. This is used on
@@ -1108,7 +1110,7 @@ function _cas_name_element_validate($element, &$form_state) {
 
   if ($uid !== FALSE) {
     // Another user is using this CAS username.
-    form_set_error('cas_name', t('The CAS username is <a href="@edit-user-url">already in use</a> on this site.', array('@edit-user-url' => url('user/' . $uid . '/edit'))));
+    form_set_error('cas_name', t('The CAS username is <a href="@edit-user-url">already in use</a> on this site.', ['@edit-user-url' => url('user/' . $uid . '/edit')]));
   }
 }
 
@@ -1121,12 +1123,12 @@ function cas_login_submit(&$form, &$form_state) {
   }
   // Force redirection.
   unset($_GET['destination']);
-  backdrop_goto('cas', array('query' => $form_state['values']['cas.return_to']));
+  backdrop_goto('cas', ['query' => $form_state['values']['cas.return_to']]);
 }
 
 /**
- * @todo Please document this function.
  * @see http://drupal.org/node/1354
+ * @todo Please document this function.
  */
 function _cas_single_sign_out_check() {
   if (isset($_POST["logoutRequest"])) {
@@ -1147,10 +1149,10 @@ function _cas_single_sign_out_check() {
         // first lets find out who we want to log off
 
         $hashed_ticket = hash('sha256', $cas_session_index);
-        $record = db_query_range("SELECT cld.uid, u.name FROM {users} u JOIN {cas_login_data} cld ON u.uid = cld.uid WHERE cld.cas_session_id = :ticket", 0, 1, array(':ticket' => $hashed_ticket))->fetchObject();
+        $record = db_query_range("SELECT cld.uid, u.name FROM {users} u JOIN {cas_login_data} cld ON u.uid = cld.uid WHERE cld.cas_session_id = :ticket", 0, 1, [':ticket' => $hashed_ticket])->fetchObject();
         if ($record) {
-          watchdog('user', 'Session closed for %name by CAS logout request.', array('%name' => $record->name));
-          //remove all entry for user id in cas_login_data
+          watchdog('user', 'Session closed for %name by CAS logout request.', ['%name' => $record->name]);
+          // Remove all entry for user id in cas_login_data.
           db_delete('cas_login_data')
             ->condition('uid', $record->uid)
             ->execute();
@@ -1195,21 +1197,20 @@ function cas_is_external_user($account = NULL) {
 
 
 /**
- * @todo Please document this function.
  * @see http://drupal.org/node/1354
+ * @todo Please document this function.
  */
 function _cas_single_sign_out_save_token($user) {
-  // Ok lets save the CAS service ticket to DB so
-  // we can handle CAS logoutRequests when they come
+  // Ok lets save the CAS service ticket to DB so we can handle CAS logoutRequests when they come.
   if ($user->uid && $user->uid > 0 && !empty($_SESSION['cas_ticket'])) {
     $hashed_ticket = hash('sha256', $_SESSION['cas_ticket']);
     db_merge('cas_login_data')
-      ->key(array('cas_session_id' => $hashed_ticket))
-      ->fields(array(
+      ->key(['cas_session_id' => $hashed_ticket])
+      ->fields([
         'cas_session_id' => $hashed_ticket,
         'uid' => $user->uid,
         'created' => time(),
-      ))
+      ])
       ->execute();
     unset($_SESSION['cas_ticket']);
   }
@@ -1228,14 +1229,12 @@ function _cas_single_sign_out_save_ticket() {
 /**
  * Determine whether a CAS user is blocked.
  *
- * @param $cas_name
- *   The CAS username.
+ * @param $cas_name The CAS username.
  *
- * @return
- *   Boolean TRUE if the user is blocked, FALSE if the user is active.
+ * @return Boolean TRUE if the user is blocked, FALSE if the user is active.
  */
 function _cas_external_user_is_blocked($cas_name) {
-  return db_query("SELECT name FROM {users} u JOIN {cas_user} c ON u.uid = c.uid WHERE u.status = 0 AND c.cas_name = :cas_name", array(':cas_name' => $cas_name))->fetchField();
+  return db_query("SELECT name FROM {users} u JOIN {cas_user} c ON u.uid = c.uid WHERE u.status = 0 AND c.cas_name = :cas_name", [':cas_name' => $cas_name])->fetchField();
 }
 
 /**
@@ -1255,7 +1254,8 @@ function cas_user_module_invoke($type, &$edit, $account) {
  * Roles which should be granted to all CAS users.
  *
  * @return
- *   An associative array with the role id as the key and the role name as value.
+ *   An associative array with the role id as the key and the role name as
+ *   value.
  */
 function cas_roles() {
   $config = config('cas.settings');
@@ -1283,25 +1283,30 @@ function cas_roles() {
  *   The user object of the created user, or FALSE if the user cannot be
  *   created.
  */
-function cas_user_register($cas_name, $options = array()) {
+function cas_user_register($cas_name, $options = []) {
   $config = config('cas.settings');
   // Add some reasonable defaults if they have not yet been provided.
-  $edit = isset($options['edit']) ? $options['edit'] : array();
-  $edit += array(
+  $edit = isset($options['edit']) ? $options['edit'] : [];
+  $edit += [
     'name' => $cas_name,
     'pass' => user_password(),
     'init' => $cas_name,
     'mail' => $config->get('cas_domain') ? $cas_name . '@' . $config->get('cas_domain') : '',
     'status' => 1,
-    'roles' => array(),
-  );
+    'roles' => [],
+  ];
 
   $cas_roles = cas_roles();
   $edit['roles'] += array_keys($cas_roles);
   $edit['cas_name'] = $cas_name;
 
   // See if the username is already taken.
-  if ((bool) db_select('users')->fields('users', array('name'))->condition('name', db_like($edit['name']), 'LIKE')->range(0, 1)->execute()->fetchField()) {
+  if ((bool) db_select('users')
+    ->fields('users', ['name'])
+    ->condition('name', db_like($edit['name']), 'LIKE')
+    ->range(0, 1)
+    ->execute()
+    ->fetchField()) {
     return FALSE;
   }
 
@@ -1310,15 +1315,15 @@ function cas_user_register($cas_name, $options = array()) {
   $account->save();
   $formattedName = user_format_name($account);
 
-  watchdog("user", 'new user: %n (CAS)', array('%n' => $formattedName), WATCHDOG_NOTICE, l(t("edit user"), "user/edit/$account->uid"));
+  watchdog("user", 'new user: %n (CAS)', ['%n' => $formattedName], WATCHDOG_NOTICE, l(t("edit user"), "user/edit/$account->uid"));
 
   if (!empty($options['invoke_cas_user_presave'])) {
     // Populate $edit with some basic properties.
-    $edit = array(
-      'cas_user' => array(
+    $edit = [
+      'cas_user' => [
         'name' => $cas_name,
-      ),
-    );
+      ],
+    ];
 
     // Allow other modules to make their own custom changes.
     cas_user_module_invoke('presave', $edit, $account);
@@ -1342,7 +1347,6 @@ function cas_user_register($cas_name, $options = array()) {
  * Get the CAS attributes of the current CAS user.
  *
  * Ensures that phpCAS is properly initialized before getting the attributes.
- * @see phpCAS::getAttributes()
  *
  * @param $cas_name
  *   If provided, ensure that the currently logged in CAS user matches this
@@ -1350,12 +1354,14 @@ function cas_user_register($cas_name, $options = array()) {
  *
  * @return
  *   An associative array of CAS attributes.
+ * @see phpCAS::getAttributes()
+ *
  */
 function cas_phpcas_attributes($cas_name = NULL) {
   if (isset($cas_name) && $cas_name != cas_current_user()) {
     // Attributes cannot be extracted for other users, since they are
     // stored in the session variable.
-    return array();
+    return [];
   }
 
   cas_phpcas_init();
@@ -1365,7 +1371,7 @@ function cas_phpcas_attributes($cas_name = NULL) {
     }
   }
 
-  return array();
+  return [];
 }
 
 
@@ -1373,6 +1379,7 @@ function cas_phpcas_attributes($cas_name = NULL) {
  * Insert an array into the specified position of another array.
  *
  * Preserve keys in associative arrays.
+ *
  * @see http://www.php.net/manual/en/function.array-splice.php#56794
  */
 function _cas_array_insert(&$array, $position, $insert_array) {
@@ -1384,10 +1391,10 @@ function _cas_array_insert(&$array, $position, $insert_array) {
  * Implements hook_views_api().
  */
 function cas_views_api() {
-  return array(
+  return [
     'api' => 3,
     'path' => backdrop_get_path('module', 'cas') . '/includes/views',
-  );
+  ];
 }
 
 /**
@@ -1398,7 +1405,7 @@ function cas_views_api() {
  */
 function _cas_redirect_after_login($cas_first_login) {
   $config = config('cas.settings');
-  // When users first log in, we may want to redirect them to a special page if specified
+  // When users first log in, we may want to redirect them to a special page if specified.
   if ($cas_first_login && $config->get('cas_first_login_destination')) {
     $destination = $config->get('cas_first_login_destination');
     backdrop_goto($destination);
@@ -1410,9 +1417,9 @@ function _cas_redirect_after_login($cas_first_login) {
       backdrop_goto('');
     }
     // If logged in through gateway feature, then just reload the current path
-    // and preserve any query string args that were set
+    // and preserve any query string args that were set.
     else {
-      backdrop_goto(current_path(), array('query' => backdrop_get_query_parameters()));
+      backdrop_goto(current_path(), ['query' => backdrop_get_query_parameters()]);
     }
   }
 }
@@ -1421,7 +1428,7 @@ function _cas_redirect_after_login($cas_first_login) {
  * Implements hook_autoload_info().
  */
 function cas_autoload_info() {
-  return array(
+  return [
     'cas_handler_field_cas_name' => 'includes/views/handlers/cas_handler_field_cas_name.inc',
     'CAS_AuthenticationException' => 'phpCAS/source/CAS/AuthenticationException.php',
     'CAS_Client' => 'phpCAS/source/CAS/Client.php',
@@ -1471,5 +1478,5 @@ function cas_autoload_info() {
     'CAS_Session_PhpSession' => 'phpCAS/source/CAS/Session/PhpSession.php',
     'CAS_TypeMismatchException' => 'phpCAS/source/CAS/TypeMismatchException.php',
     'phpCAS' => 'phpCAS/source/CAS.php',
-  );
+  ];
 }

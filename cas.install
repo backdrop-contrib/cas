@@ -172,39 +172,6 @@ function cas_enable() {
   backdrop_set_message(t('CAS has been enabled. Please <a href="@url">configure</a> it.', array('@url' => url('admin/config/people/cas'))), 'warning');
 }
 
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function cas_update_1() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function cas_update_6300() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function cas_update_6301() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function cas_update_6302() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function cas_update_6303() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function cas_update_6304() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function cas_update_7000(&$sandbox) { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function cas_update_7101() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function cas_update_7102() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function cas_update_7103() { }
-
-// TODO The old hook_update_N functions cannot be applied to Backdrop.
-function cas_update_7104() { }
-
 /**
  * Implements hook_update_last_removed().
  */
@@ -293,12 +260,4 @@ function cas_update_1000() {
   update_variable_del('cas_first_login');
   update_variable_del('cas_logout_redirect');
   update_variable_del('cas_check_first');
-}
-
-/**
- * Implements hook_install().
- */
-function cas_install() {
-  // Dynamically generated variable data was detected.
-  // /cas/cas.module line 1391
 }

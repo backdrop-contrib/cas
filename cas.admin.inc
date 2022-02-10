@@ -120,7 +120,7 @@ function cas_admin_settings() {
     '#description' => t('Message users see at the top of the CAS login form to warn them that they are being redirected to the CAS server.'),
   );
 
-  // Setting for message displayed to user upon successful login
+  // Setting for message displayed to user upon successful login.
   $form['login']['cas_login_message'] = array(
     '#type' => 'textfield',
     '#title' => t('Successful login message'),
@@ -249,7 +249,7 @@ function cas_admin_settings() {
     '#collapsed' => TRUE,
   );
 
-  // Settings for redirection upon first login
+  // Settings for redirection upon first login.
   $form['misc']['cas_first_login_destination'] = array(
     '#type' => 'textfield',
     '#title' => t('Initial login destination'),
@@ -259,7 +259,7 @@ function cas_admin_settings() {
     '#description' => t("Backdrop path or URL. Enter a destination if you want the user to be redirected to this page on their first CAS login. An example path is <em>blog</em> for the blog page, <em>&lt;front&gt;</em> for the front page, or <em>user</em> for the user's page."),
   );
 
-  // Setting for page to return to after a CAS logout
+  // Setting for page to return to after a CAS logout.
   $form['misc']['cas_logout_destination'] = array(
     '#type' => 'textfield',
     '#title' => t('Logout destination'),
@@ -360,7 +360,7 @@ function cas_admin_settings() {
 
 /**
  * Proxy chain object only exists with phpCAS version >= 1.3. As phpCAS CAS.php
- * is include only after building element 'cas_library_info_dir', we must check it after it.
+ * is included only after building element 'cas_library_info_dir', we must check it after it.
  */
 function cas_proxy_list_version_check($element, &$form_state) {
   if (!defined('PHPCAS_VERSION') || version_compare(PHPCAS_VERSION, '1.3', '<')) {

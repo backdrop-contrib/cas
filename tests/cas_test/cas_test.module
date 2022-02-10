@@ -259,7 +259,7 @@ function _cas_test_ticket_generate($service, $cas_user) {
  *   invalid.
  */
 function _cas_test_ticket_validate($service, $ticket) {
-  // Look up the ticket
+  // Look up the ticket.
   $cas_name = FALSE;
   $tickets = config_get('cas_test.settings', 'cas_test_tickets');
   if (isset($tickets[$service][$ticket])) {

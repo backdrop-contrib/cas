@@ -20,10 +20,3 @@ function cas_test_update_1000() {
   update_variable_del('cas_test_tickets');
   update_variable_del('cas_test_sso');
 }
-
-/**
- * Implements hook_install().
- */
-function cas_test_install() {
-  // Dynamically generated variable data was detected.
-}
