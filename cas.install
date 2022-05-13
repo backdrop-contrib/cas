@@ -261,3 +261,19 @@ function cas_update_1000() {
   update_variable_del('cas_logout_redirect');
   update_variable_del('cas_check_first');
 }
+
+/**
+ * Migrate Drupal 7's role ID schema for the authenticated role to Backdrop.
+ */
+function cas_update_1001() {
+  $configFile = config('cas.settings');
+  $configData = $configFile->get();
+
+  if (array_key_exists("2", $configData['cas_auto_assigned_role'])) {
+    $configData['cas_auto_assigned_role'][BACKDROP_AUTHENTICATED_ROLE] = $configData['cas_auto_assigned_role'][2];
+    unset($configData['cas_auto_assigned_role'][2]);
+
+    $configFile->setData($configData);
+    $configFile->save();
+  }
+}

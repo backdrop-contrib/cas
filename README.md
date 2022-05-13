@@ -13,8 +13,7 @@ Minimum of PHP 5.6 with the following extensions: curl, openssl, dom, zlib, and 
 
 Installation
 ------------
-Install this module using the official Backdrop CMS instructions at
-https://docs.backdropcms.org/documentation/extend-with-modules.
+Install this module using the official [Backdrop CMS instructions](https://docs.backdropcms.org/documentation/extend-with-modules).
 
   - Navigate to Configuration > User accounts > CAS settings to configure the CAS module.
 

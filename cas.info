@@ -4,4 +4,3 @@ backdrop = 1.x
 type = module
 description = "Provides single sign-on Central Authentication Services (CAS)"
 configure = admin/config/people/cas
-
