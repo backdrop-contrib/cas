@@ -25,8 +25,13 @@ function cas_test_cas_phpcas_alter() {
     'absolute' => TRUE,
   )));
 
-  // TODO This variable was probably removed in Backdrop without replacement.
-  switch (variable_get('cas_version', '3.0')) {
+  $version = config_get('cas.settings', 'cas_version');
+
+  if (!$version) {
+    $version = '3.0';
+  }
+
+  switch ( $version) {
     case CAS_VERSION_1_0:
       phpCAS::setServerServiceValidateURL(url('cas_test/validate', array('absolute' => TRUE)));
       break;
