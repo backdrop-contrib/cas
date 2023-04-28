@@ -7,7 +7,7 @@ namespace Composer\Autoload;
 class ComposerStaticInite3f7bcb549a2140a027bc7a016c8d985
 {
     public static $files = array (
-        'b427b9c7c3c82e12d1c4ffadb5655c30' => __DIR__ . '/..' . '/apereo/phpcas/CAS.php',
+        '344f11dc3484aaed5cbde58e23513be4' => __DIR__ . '/..' . '/apereo/phpcas/source/CAS.php',
     );
 
     public static $prefixLengthsPsr4 = array (
