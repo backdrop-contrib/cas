@@ -6,5 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'b427b9c7c3c82e12d1c4ffadb5655c30' => $vendorDir . '/apereo/phpcas/CAS.php',
+    '344f11dc3484aaed5cbde58e23513be4' => $vendorDir . '/apereo/phpcas/source/CAS.php',
 );
